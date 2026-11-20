@@ -4,7 +4,7 @@ style=re.search(r'<style>(.*?)</style>',v2,re.S).group(1)
 defs=open('mark_defs.txt').read(); body=open('mark_body.txt').read()
 if not defs.strip().startswith('<defs'): defs='<defs>'+defs+'</defs>'
 z=open('newton.zip','rb').read(); sha=hashlib.sha256(z).hexdigest(); kb=round(len(z)/1024)
-VER="2.2.0"
+VER="2.2.1"
 extra='''
 .dl-hero{position:relative;overflow:hidden;isolation:isolate;padding-block:calc(var(--nav-h) + 90px) 90px}
 .dl-grid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:clamp(28px,5vw,72px);align-items:center}
@@ -132,7 +132,8 @@ html=f'''<!DOCTYPE html>
   <div class="wrap">
     <div class="sec-head rv"><h2 id="rel-h">Release notes.</h2></div>
     <div class="rel">
-      <div class="rv"><b>{VER}</b><p><strong>Installer and updates.</strong> One-file install into <code>~/.local/bin</code>, a marked block in your shell config, <code>newton update</code> from a zip, folder or link, <code>newton uninstall</code>, and install checks in <code>newton doctor</code>. Chromebook is supported.</p></div>
+      <div class="rv"><b>{VER}</b><p><strong>Tab works in more places.</strong> Sentences that start with <code>newton</code>, such as <code>newton find big files</code>, now turn into commands with Tab. Newton also recognises many more everyday words, so shorter requests are caught. <kbd>Esc</kbd> then <kbd>N</kbd> forces Newton on any line.</p></div>
+      <div class="rv"><b>2.2</b><p><strong>Installer and updates.</strong> One-file install into <code>~/.local/bin</code>, a marked block in your shell config, <code>newton update</code> from a zip, folder or link, <code>newton uninstall</code>, and install checks in <code>newton doctor</code>. Chromebook is supported.</p></div>
       <div class="rv"><b>2.1</b><p><strong>Plan mode, upgraded.</strong> Works better with small local models, preflight check for needed programs, undo, export as a script or Markdown, per-step timing, and a tab title and bell when a plan finishes.</p></div>
       <div class="rv"><b>2.0</b><p><strong>Plan mode, ask, chat, fix and commit.</strong> Checklists you approve one step at a time, questions answered in the terminal, failed commands explained and fixed, and commit messages written from your staged changes.</p></div>
       <div class="rv"><b>1.0</b><p><strong>Tab to command.</strong> Type a sentence, press Tab, get the command. Safety flags, secret redaction, and Claude, OpenAI-compatible and Ollama support for zsh, bash and fish.</p></div>

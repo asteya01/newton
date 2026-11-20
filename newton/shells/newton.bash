@@ -20,7 +20,8 @@ _newton_orig=""
 _newton_tab_fallback="$(bind -p 2>/dev/null | sed -n 's/^"\\C-i": //p' | head -n1)"
 case "$_newton_tab_fallback" in ""|*newton*|self-insert) _newton_tab_fallback=complete ;; esac
 
-_newton_english=" the a an all every that which from into in on of for with my me than bigger larger smaller older newer files folder folders directory directories this these those is are using named called containing recursively everything each current last and or how what show list "
+_newton_english=" the a an all every that which from into in on of for with my me than bigger larger smaller older newer files folder folders directory directories this these those is are using named called containing recursively everything each current last and or how what show list to by at it its you please can i want not only any new old big large small biggest largest first top count number size sizes bytes lines line name names extension type modified created today yesterday hours days minutes ago port process processes running listening free space disk memory usage over under between per out up down again then so was be do does display get give print find where who when why inside outside text content contents whose has have had "
+_newton_subcmds=" suggest explain setup init doctor history config help plan resume plans status prompt ask chat fix commit update uninstall "
 
 _newton_is_natural() {
   local line="${1# }" w hits=0
@@ -31,11 +32,18 @@ _newton_is_natural() {
   read -r -a words <<< "$line"
   (( ${#words[@]} >= 3 )) || return 1
   for w in "${words[@]}"; do [[ "$w" == -* ]] && return 1; done
+  if [[ "${words[0]}" == newton ]]; then
+    [[ "$_newton_subcmds" == *" ${words[1]} "* ]] && return 1
+    return 0
+  fi
   type -t -- "${words[0]}" >/dev/null 2>&1 || return 0
   for w in "${words[@]:1}"; do
     [[ "$_newton_english" == *" ${w,,} "* ]] && hits=$((hits + 1))
   done
-  (( hits >= 2 ))
+  (( hits >= 2 )) && return 0
+  (( hits >= 1 && ${#words[@]} >= 4 )) || return 1
+  [[ "$line" == *[/.~\*\?@:]* ]] && return 1
+  return 0
 }
 
 _newton_say() { printf '\r\033[2K\033[38;5;245m%s\033[0m\n' "$*" >&2; }
@@ -44,7 +52,8 @@ _newton_translate() {
   local desc="$READLINE_LINE" out line cmd="" note="" warn="" errmsg=""
   local -a alts=()
   printf '\r\033[2K\033[38;5;245m  ◌ newton is thinking…\033[0m' >&2
-  out="$(command newton suggest --porcelain --shell bash -- "$desc" 2>/dev/null)"
+  local ask="$desc"; [[ "$ask" == "newton "* ]] && ask="${ask#newton }"
+  out="$(command newton suggest --porcelain --shell bash -- "$ask" 2>/dev/null)"
   while IFS= read -r line; do
     case "${line%%$'\t'*}" in
       cmd)  cmd="${line#*$'\t'}" ;;

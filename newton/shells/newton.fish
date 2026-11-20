@@ -5,7 +5,7 @@
 #    Tab        plain English → command   (normal completion otherwise)
 #    Tab again  cycle through alternative commands
 #    Shift+Tab  put your original words back
-#    Alt+N      force Newton on the current line
+#    Alt+N      force Newton (or press Esc then N) on the current line
 # ─────────────────────────────────────────────────────────────────────────────
 if status is-interactive; and not set -q __newton_loaded
     set -g __newton_loaded 1
@@ -16,7 +16,9 @@ if status is-interactive; and not set -q __newton_loaded
     set -g __newton_orig ""
     set -g __newton_english the a an all every that which from into in on of for with my me than \
         bigger larger smaller older newer files folder folders directory directories this these those is are \
-        using named called containing recursively everything each current last and or how what show list
+        using named called containing recursively everything each current last and or how what show list \
+        to by at it its you please can i want not only any new old big large small biggest largest first top count number size sizes bytes lines line name names extension type modified created today yesterday hours days minutes ago port process processes running listening free space disk memory usage over under between per out up down again then so was be do does display get give print find where who when why inside outside text content contents whose has have had
+    set -g __newton_subcmds suggest explain setup init doctor history config help plan resume plans status prompt ask chat fix commit update uninstall
 
     function __newton_is_natural --argument-names line
         set line (string trim -- $line)
@@ -28,19 +30,27 @@ if status is-interactive; and not set -q __newton_loaded
         for w in $words
             string match -q -- '-*' $w; and return 1
         end
+        if test "$words[1]" = newton
+            contains -- $words[2] $__newton_subcmds; and return 1
+            return 0
+        end
         type -q -- $words[1]; or return 0
         set -l hits 0
         for w in $words[2..-1]
             contains -- (string lower -- $w) $__newton_english; and set hits (math $hits + 1)
         end
-        test $hits -ge 2
+        test $hits -ge 2; and return 0
+        test $hits -ge 1 -a (count $words) -ge 4; or return 1
+        string match -qr -- '[/.~*?@:]' $line; and return 1
+        return 0
     end
 
     function __newton_translate
         set -l desc (commandline)
         set -l cmd; set -l note; set -l warn; set -l err; set -l alts
         printf '\r\033[2K\033[38;5;245m  ◌ newton is thinking…\033[0m' >&2
-        for line in (command newton suggest --porcelain --shell fish -- "$desc" 2>/dev/null)
+        set -l ask (string replace -r '^newton ' '' -- $desc)
+        for line in (command newton suggest --porcelain --shell fish -- "$ask" 2>/dev/null)
             set -l kv (string split -m1 \t -- $line)
             switch $kv[1]
                 case cmd;  set cmd $kv[2]

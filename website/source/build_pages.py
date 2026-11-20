@@ -165,7 +165,7 @@ docs_body=f'''
 <p>Everything sent passes through a redactor first: API keys, tokens, passwords and private keys are replaced with placeholders. With Ollama nothing leaves your machine. Newton has no telemetry.</p></section>
 
 <section id="help"><h2>Troubleshooting</h2>
-<ul><li><strong>Tab does normal completion on my sentence.</strong> Start the line with <code>#</code>, or press <kbd>Alt</kbd>+<kbd>N</kbd>.</li>
+<ul><li><strong>Tab does normal completion on my sentence.</strong> Start the line with <code>#</code>, or press <kbd>Esc</kbd> then <kbd>N</kbd>. That works in every terminal; <kbd>Alt</kbd>+<kbd>N</kbd> only works if your terminal sends Option as Meta, which macOS Terminal and iTerm don't by default. A line like <code>newton find big files</code> also works with Tab.</li>
 <li><strong>Tab stopped completing with oh-my-zsh or fzf-tab.</strong> Load Newton after other plugins (put the <code>eval</code> line last).</li>
 <li><strong>macOS bash.</strong> The built-in bash 3.2 is too old. Use zsh (the macOS default) or <code>brew install bash</code>.</li>
 <li><strong><code>newton: command not found</code> after installing.</strong> Open a new terminal. If it persists, run <code>~/.local/bin/newton doctor</code>.</li>

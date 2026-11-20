@@ -256,7 +256,7 @@ The suite runs against a local mock of the API (no key or network needed) and in
 
 ## Troubleshooting
 
-- **Tab does normal completion on my sentence.** Start the line with `#`, or press <kbd>Alt</kbd>+<kbd>N</kbd>.
+- **Tab does normal completion on my sentence.** Start the line with `#`, or press <kbd>Esc</kbd> then <kbd>N</kbd> (works in every terminal; <kbd>Alt</kbd>+<kbd>N</kbd> only works if your terminal sends Option as Meta, which macOS Terminal and iTerm don't by default). A line that starts with `newton` followed by a sentence, like `newton find big files`, also works with Tab.
 - **Tab stopped completing with oh-my-zsh or fzf-tab.** Load Newton *after* other plugins (put the `eval` line last) so it can hand Tab back to them.
 - **macOS bash.** The built-in bash 3.2 is too old. `brew install bash`, or use zsh (the macOS default).
 - **`newton: command not found` after installing.** Open a new terminal. If it persists, run `~/.local/bin/newton doctor`; it checks your PATH and tells you what to fix.

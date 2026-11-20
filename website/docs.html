@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Documentation · Newton</title>
+<title>Download Newton 2.2.1</title>
 <meta name="description" content="Newton documentation: install, keys, plan mode, commands, providers, settings and privacy.">
 <meta name="theme-color" content="#05080D">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='15' fill='%230B1118'/%3E%3Cpath d='M15 29l13 10-13 10' fill='none' stroke='%237DF08A' stroke-width='6' stroke-linecap='round' stroke-linejoin='round'/%3E%3Crect x='33' y='46' width='16' height='5' rx='2.5' fill='%23fff'/%3E%3Ccircle cx='44' cy='24' r='7' fill='%233DF5A7'/%3E%3C/svg%3E">
@@ -640,7 +640,7 @@ sh install.sh --bin-dir ~/bin   # install somewhere else</code></pre><button cla
 <p>Everything sent passes through a redactor first: API keys, tokens, passwords and private keys are replaced with placeholders. With Ollama nothing leaves your machine. Newton has no telemetry.</p></section>
 
 <section id="help"><h2>Troubleshooting</h2>
-<ul><li><strong>Tab does normal completion on my sentence.</strong> Start the line with <code>#</code>, or press <kbd>Alt</kbd>+<kbd>N</kbd>.</li>
+<ul><li><strong>Tab does normal completion on my sentence.</strong> Start the line with <code>#</code>, or press <kbd>Esc</kbd> then <kbd>N</kbd>. That works in every terminal; <kbd>Alt</kbd>+<kbd>N</kbd> only works if your terminal sends Option as Meta, which macOS Terminal and iTerm don't by default. A line like <code>newton find big files</code> also works with Tab.</li>
 <li><strong>Tab stopped completing with oh-my-zsh or fzf-tab.</strong> Load Newton after other plugins (put the <code>eval</code> line last).</li>
 <li><strong>macOS bash.</strong> The built-in bash 3.2 is too old. Use zsh (the macOS default) or <code>brew install bash</code>.</li>
 <li><strong><code>newton: command not found</code> after installing.</strong> Open a new terminal. If it persists, run <code>~/.local/bin/newton doctor</code>.</li>

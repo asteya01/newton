@@ -6,7 +6,7 @@
 #    Tab        plain English → command   (normal completion otherwise)
 #    Tab again  cycle through alternative commands
 #    Shift+Tab  put your original words back
-#    Alt+N      force Newton on the current line, whatever it looks like
+#    Alt+N      force Newton (or press Esc then N) on the current line, whatever it looks like
 #    # prefix   "# anything" always goes to Newton
 # ─────────────────────────────────────────────────────────────────────────────
 if [[ -z "$_NEWTON_LOADED" ]]; then
@@ -24,7 +24,9 @@ typeset -g _newton_stab_fallback="${$(bindkey '^[[Z' 2>/dev/null)##* }"
 # Words that show up in plain-English requests but rarely as shell arguments.
 typeset -ga _newton_english=(the a an all every that which from into in on of for with my me than
   bigger larger smaller older newer files folder folders directory directories this these those is are
-  using named called containing recursively everything each current last and or how what show list)
+  using named called containing recursively everything each current last and or how what show list
+  to by at it its you please can i want not only any new old big large small biggest largest first top count number size sizes bytes lines line name names extension type modified created today yesterday hours days minutes ago port process processes running listening free space disk memory usage over under between per out up down again then so was be do does display get give print find where who when why inside outside text content contents whose has have had)
+typeset -g _newton_subcmds=" suggest explain setup init doctor history config help plan resume plans status prompt ask chat fix commit update uninstall "
 
 _newton_is_natural() {
   emulate -L zsh
@@ -37,12 +39,21 @@ _newton_is_natural() {
   (( ${#words} >= 3 )) || return 1
   local w
   for w in $words; do [[ "$w" == -* ]] && return 1; done
-  # First word isn't a command/alias/function → it's a sentence.
+  # `newton find big files` (the documented shorthand): anything that isn't a subcommand is a sentence.
+  if [[ "${words[1]}" == newton ]]; then
+    [[ "$_newton_subcmds" == *" ${words[2]} "* ]] && return 1
+    return 0
+  fi
+  # First word isn't a command/alias/function → a sentence.
   whence -- "${words[1]}" >/dev/null 2>&1 || return 0
   # First word *is* a command ("find", "kill", "git"…) → look for English.
   local -i hits=0
   for w in ${words[2,-1]}; do (( ${_newton_english[(Ie)${w:l}]} )) && (( hits++ )); done
-  (( hits >= 2 ))
+  (( hits >= 2 )) && return 0
+  # Four or more words with one English word and nothing path-like is still a sentence.
+  (( hits >= 1 && ${#words} >= 4 )) || return 1
+  [[ "$line" == *[/.~\*\?@:]* ]] && return 1
+  return 0
 }
 
 _newton_translate() {
@@ -51,7 +62,8 @@ _newton_translate() {
   local -a alts
   zle -M "  ◌ newton is thinking…"
   zle -R
-  out="$(command newton suggest --porcelain --shell zsh -- "$desc" 2>/dev/null)"
+  local ask="$desc"; [[ "$ask" == "newton "* ]] && ask="${ask#newton }"
+  out="$(command newton suggest --porcelain --shell zsh -- "$ask" 2>/dev/null)"
   for line in "${(@f)out}"; do
     case "${line%%$'\t'*}" in
       cmd)  cmd="${line#*$'\t'}" ;;
