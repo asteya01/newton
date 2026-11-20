@@ -1,0 +1,13 @@
+<defs>
+  <linearGradient id="tile" x1="0.2" y1="0" x2="0.8" y2="1"><stop offset="0" stop-color="#1A212C"/><stop offset="0.55" stop-color="#0E131A"/><stop offset="1" stop-color="#070A0E"/></linearGradient>
+  <linearGradient id="rim" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFFFFF" stop-opacity="0.22"/><stop offset="0.35" stop-color="#FFFFFF" stop-opacity="0.05"/><stop offset="1" stop-color="#FFFFFF" stop-opacity="0.02"/></linearGradient>
+  <radialGradient id="halo" cx="0.66" cy="0.36" r="0.55"><stop offset="0" stop-color="#46F2A8" stop-opacity="0.20"/><stop offset="1" stop-color="#46F2A8" stop-opacity="0"/></radialGradient>
+  <radialGradient id="sheen" cx="0.25" cy="0.05" r="0.7"><stop offset="0" stop-color="#FFFFFF" stop-opacity="0.07"/><stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/></radialGradient>
+  <linearGradient id="glow" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#D4FA6A"/><stop offset="0.55" stop-color="#7DF08A"/><stop offset="1" stop-color="#22DDA0"/></linearGradient>
+  <radialGradient id="orb" cx="0.36" cy="0.32" r="0.78"><stop offset="0" stop-color="#F2FFB8"/><stop offset="0.35" stop-color="#B9F566"/><stop offset="0.75" stop-color="#3FE39A"/><stop offset="1" stop-color="#16B97F"/></radialGradient>
+  <linearGradient id="leaf" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#7EE86F"/><stop offset="1" stop-color="#D8FB72"/></linearGradient>
+  <linearGradient id="trail" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#9BF57A" stop-opacity="0.7"/><stop offset="1" stop-color="#9BF57A" stop-opacity="0"/></linearGradient>
+  <linearGradient id="cursor" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#D5DCE6"/></linearGradient>
+  <filter id="blur" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="16"/></filter>
+  <filter id="soft" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="6"/></filter>
+  <clipPath id="clip"><rect x="16" y="16" width="480" height="480" rx="112"/></clipPath></defs>

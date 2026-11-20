@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "newton-cli"
+version = "2.2.0"
+description = "Think it. Tab it. Done. Natural language to shell commands, right in your prompt."
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+authors = [{ name = "Newton" }]
+keywords = ["cli", "shell", "terminal", "ai", "zsh", "bash", "fish", "productivity"]
+classifiers = [
+  "Environment :: Console",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: MacOS",
+  "Operating System :: POSIX :: Linux",
+  "Programming Language :: Python :: 3",
+  "Topic :: System :: Shells",
+  "Topic :: Utilities",
+]
+dependencies = []
+
+[project.scripts]
+newton = "newton.cli:main"
+
+[tool.setuptools]
+packages = ["newton"]
+
+[tool.setuptools.package-data]
+newton = ["shells/*"]

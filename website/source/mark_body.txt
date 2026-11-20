@@ -1,0 +1,24 @@
+
+  <rect x="16" y="16" width="480" height="480" rx="112" fill="url(#tile)"/>
+  <g clip-path="url(#clip)">
+    <rect x="16" y="16" width="480" height="480" fill="url(#halo)"/>
+    <rect x="16" y="16" width="480" height="480" fill="url(#sheen)"/>
+    <!-- glows -->
+    <circle cx="336" cy="200" r="58" fill="#3DF5A7" opacity="0.45" filter="url(#blur)"/>
+    <path d="M120 236 L222 318 L120 400" fill="none" stroke="#7DF08A" stroke-width="44" stroke-linecap="round" stroke-linejoin="round" opacity="0.35" filter="url(#blur)"/>
+  </g>
+  <rect x="17.5" y="17.5" width="477" height="477" rx="110.5" fill="none" stroke="url(#rim)" stroke-width="3"/>
+  <!-- motion trail -->
+  <rect x="300" y="64" width="10" height="56" rx="5" fill="url(#trail)" opacity="0.55"/>
+  <rect x="331" y="44" width="10" height="70" rx="5" fill="url(#trail)" opacity="0.8"/>
+  <rect x="362" y="70" width="10" height="44" rx="5" fill="url(#trail)" opacity="0.45"/>
+  <!-- the apple -->
+  <ellipse cx="336" cy="252" rx="40" ry="6" fill="#000" opacity="0.35" filter="url(#soft)"/>
+  <circle cx="336" cy="196" r="54" fill="url(#orb)"/>
+  <ellipse cx="318" cy="174" rx="17" ry="11" transform="rotate(-35 318 174)" fill="#FFFFFF" opacity="0.55"/>
+  <path d="M337 143 C 337 136, 338 130, 341 124" stroke="#2E7D57" stroke-width="5" stroke-linecap="round" fill="none"/>
+  <path d="M340 140 C 346 116, 368 106, 390 110 C 386 133, 365 146, 340 140 Z" fill="url(#leaf)"/>
+  <path d="M344 136 C 356 126, 370 118, 384 114" stroke="#5CC56E" stroke-width="2.5" stroke-linecap="round" fill="none" opacity="0.8"/>
+  <!-- the prompt -->
+  <path d="M120 236 L222 318 L120 400" fill="none" stroke="url(#glow)" stroke-width="44" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="262" y="372" width="126" height="40" rx="20" fill="url(#cursor)"/>
