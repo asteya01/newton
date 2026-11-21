@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "newton-cli"
-version = "2.2.1"
+version = "2.3.0"
 description = "Think it. Tab it. Done. Natural language to shell commands, right in your prompt."
 readme = "README.md"
 requires-python = ">=3.9"
@@ -30,4 +30,4 @@ newton = "newton.cli:main"
 packages = ["newton"]
 
 [tool.setuptools.package-data]
-newton = ["shells/*"]
+newton = ["shells/*", "web/*"]

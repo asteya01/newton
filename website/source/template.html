@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Newton</title>
+<meta name="description" content="Describe what you want in plain English, press Tab, and Newton writes the exact shell command into your prompt. For bigger jobs, plan mode gives you a checklist to follow.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='15' fill='%230E131A'/%3E%3Cpath d='M15 29l13 10-13 10' fill='none' stroke='%237DF08A' stroke-width='6' stroke-linecap='round' stroke-linejoin='round'/%3E%3Crect x='33' y='46' width='16' height='5' rx='2.5' fill='%23fff'/%3E%3Ccircle cx='44' cy='24' r='7' fill='%233DF5A7'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,500..800&family=JetBrains+Mono:wght@400;500;600&family=Schibsted+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ---------------------------------------------------------------------------------------------
+   Newton. Layout idea: a dark "ink" stage for the product in motion (hero, playground, safety, install)
+   alternating with pale mint-paper bands for reading. Terminals are the objects; the Tab keycap is the signature.
+   --------------------------------------------------------------------------------------------- */
+:root {
+  --ink: #091015;        /* page stage */
+  --ink-2: #0F1920;      /* raised dark surface */
+  --ink-3: #172730;      /* dark hairline fill */
+  --paper: #F2F6F4;      /* reading band */
+  --paper-2: #FFFFFF;    /* card on paper */
+  --mint: #3DF5A7;       /* accent on dark */
+  --lime: #D4FA6A;       /* brand gradient start */
+  --leaf: #0A7552;       /* accent on paper (AA on --paper) */
+  --text: #0B1714;
+  --muted: #4F625C;
+  --text-d: #E9F1EE;
+  --muted-d: #9AAEA7;
+  --line: #D6E1DC;
+  --line-d: rgba(255, 255, 255, .1);
+  --amber: #F5B14A;
+  --red: #FF7F73;
+  --sky: #7CC4FF;
+  --violet: #C6A8FF;
+  --f-display: "Bricolage Grotesque", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Schibsted Grotesk", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, monospace;
+  --grad: linear-gradient(135deg, #D4FA6A 0%, #7DF08A 55%, #22DDA0 100%);
+  --nav-h: 68px;
+  color-scheme: dark;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: calc(var(--nav-h) + 12px); -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--ink); color: var(--text-d); font: 400 1.0625rem/1.6 var(--f-body); -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+img, svg { max-width: 100%; }
+a { color: inherit; }
+h1, h2, h3, p { margin: 0; }
+h1, h2, h3 { font-family: var(--f-display); font-weight: 700; text-wrap: balance; letter-spacing: -.025em; font-variation-settings: "opsz" 64, "wdth" 92; }
+p { text-wrap: pretty; }
+code, kbd, pre { font-family: var(--f-mono); }
+:focus-visible { outline: 2px solid var(--mint); outline-offset: 3px; border-radius: 6px; }
+.light :focus-visible { outline-color: var(--leaf); }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.skip { position: absolute; left: 16px; top: -60px; z-index: 100; background: var(--mint); color: #04110B; padding: 10px 16px; border-radius: 8px; font-weight: 600; text-decoration: none; }
+.skip:focus { top: 12px; }
+.wrap { width: min(1180px, 100% - 40px); margin-inline: auto; }
+
+/* ---------- bands ---------- */
+.band { position: relative; padding-block: clamp(72px, 9vw, 120px); }
+.band.dark { background: var(--ink); color: var(--text-d); }
+.band.dark-2 { background: var(--ink-2); color: var(--text-d); }
+.band.light { background: var(--paper); color: var(--text); color-scheme: light; }
+.band.white { background: var(--paper-2); color: var(--text); color-scheme: light; }
+.lead { font-size: clamp(1.05rem, 1.4vw, 1.2rem); color: var(--muted-d); max-width: 56ch; }
+.light .lead, .white .lead { color: var(--muted); }
+.sec-head { display: grid; gap: 18px; margin-bottom: clamp(36px, 5vw, 60px); max-width: 760px; }
+.sec-head h2 { font-size: clamp(2rem, 4.4vw, 3.5rem); line-height: 1.04; }
+
+/* ---------- buttons ---------- */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 48px; padding: 0 22px; border-radius: 12px; font: 600 1rem/1 var(--f-body); text-decoration: none; border: 1px solid transparent; cursor: pointer; transition: transform .18s ease, box-shadow .18s ease, background .18s ease, border-color .18s ease; }
+.btn-primary { background: var(--grad); color: #05140C; box-shadow: 0 0 0 1px rgba(255,255,255,.18) inset, 0 8px 28px -8px rgba(61, 245, 167, .55); }
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 0 0 1px rgba(255,255,255,.28) inset, 0 14px 34px -8px rgba(61, 245, 167, .7); }
+.btn-ghost { color: var(--text-d); border-color: var(--line-d); background: rgba(255,255,255,.03); }
+.btn-ghost:hover { border-color: rgba(255,255,255,.28); background: rgba(255,255,255,.07); }
+.btn-ink { background: var(--text); color: #fff; }
+.btn-ink:hover { transform: translateY(-2px); box-shadow: 0 12px 28px -10px rgba(11, 23, 20, .5); }
+.btn-sm { min-height: 40px; padding: 0 16px; font-size: .9375rem; border-radius: 10px; }
+
+/* ---------- nav ---------- */
+.nav { position: sticky; top: 0; z-index: 50; height: var(--nav-h); background: rgba(9, 16, 21, .74); backdrop-filter: blur(14px) saturate(1.3); -webkit-backdrop-filter: blur(14px) saturate(1.3); border-bottom: 1px solid var(--line-d); }
+.nav-in { height: 100%; display: flex; align-items: center; gap: 28px; }
+.brand { display: inline-flex; align-items: center; gap: 11px; text-decoration: none; font: 700 1.45rem/1 var(--f-display); letter-spacing: -.03em; font-variation-settings: "opsz" 40, "wdth" 90; }
+.brand svg { width: 34px; height: 34px; flex: none; }
+.nav ul { display: flex; gap: 6px; list-style: none; margin: 0 0 0 auto; padding: 0; }
+.nav ul a { display: block; padding: 8px 12px; border-radius: 8px; color: var(--muted-d); text-decoration: none; font-size: .96rem; font-weight: 500; transition: color .15s, background .15s; }
+.nav ul a:hover { color: var(--text-d); background: rgba(255,255,255,.06); }
+.menu-btn { display: none; margin-left: auto; background: none; color: var(--text-d); border: 1px solid var(--line-d); border-radius: 10px; min-height: 40px; padding: 0 14px; font: 600 .9rem var(--f-body); cursor: pointer; }
+
+/* ---------- terminals ---------- */
+.term { position: relative; background: #0A1217; border: 1px solid rgba(255,255,255,.12); border-radius: 16px; box-shadow: 0 1px 0 rgba(255,255,255,.08) inset, 0 40px 90px -30px rgba(0,0,0,.75), 0 0 0 1px rgba(0,0,0,.4); overflow: hidden; color: #DCE7E3; }
+.term-bar { display: flex; align-items: center; gap: 12px; padding: 11px 16px; border-bottom: 1px solid rgba(255,255,255,.07); background: linear-gradient(#111C23, #0D161C); font: 500 .78rem/1 var(--f-mono); color: #7F938C; }
+.term-bar .tab { color: #C9D8D3; padding: 5px 10px; background: rgba(255,255,255,.06); border-radius: 6px; }
+.term-bar .where { margin-left: auto; }
+.term-body { padding: 20px 22px 22px; font: 400 clamp(.8rem, 1.5vw, .95rem)/1.75 var(--f-mono); }
+.ps { color: #6F8780; }
+.ps .chev, .chev { color: var(--mint); margin: 0 .6em 0 .5em; }
+.caret { display: inline-block; width: .6em; height: 1.15em; margin-left: 2px; background: var(--mint); vertical-align: text-bottom; animation: blink 1.05s steps(1) infinite; border-radius: 1px; }
+@keyframes blink { 50% { opacity: 0; } }
+.c-cmd { color: var(--mint); } .c-flag { color: var(--sky); } .c-str { color: #F2D58A; } .c-op { color: #7F938C; } .c-var { color: var(--violet); } .c-kw { color: var(--violet); }
+.dim { color: #7F938C; } .ok { color: var(--mint); } .warn { color: var(--amber); } .bad { color: var(--red); }
+.result { margin-top: 6px; min-height: 3.7em; opacity: 0; transform: translateY(4px); transition: opacity .25s ease, transform .25s ease; }
+.result.on { opacity: 1; transform: none; }
+.result .note { color: #8FA39C; }
+.result .note .mk { color: var(--mint); margin-right: .55em; }
+.result .hints { color: #61766F; margin-left: .9em; white-space: nowrap; }
+.result .flag { color: var(--amber); }
+kbd { display: inline-block; min-width: 1.7em; padding: 0 .45em; text-align: center; font-size: .82em; line-height: 1.6; color: #BFD0CA; background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.14); border-bottom-width: 2px; border-radius: 5px; transition: background .15s, color .15s, border-color .15s; }
+kbd.hit { background: var(--mint); color: #04140C; border-color: var(--mint); }
+.term .flash { animation: flash .5s ease; }
+@keyframes flash { 0% { background: rgba(61, 245, 167, .22); } 100% { background: transparent; } }
+
+/* ---------- the Tab keycap ---------- */
+.keycap { position: relative; display: inline-block; width: 124px; height: 84px; padding: 0; border: 0; background: none; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.keycap .cap { position: absolute; inset: 0 0 8px 0; display: grid; align-content: center; justify-items: start; padding: 0 16px; gap: 2px; border-radius: 15px; font: 600 .95rem/1 var(--f-mono); letter-spacing: .02em; color: #C8D8D2; background: linear-gradient(#2A3740, #1B262D); box-shadow: 0 8px 0 #091015, 0 14px 24px rgba(0,0,0,.55), 0 0 0 1px rgba(255,255,255,.1) inset, 0 1px 0 rgba(255,255,255,.2) inset; transition: transform .09s ease-out, box-shadow .09s ease-out, color .2s; }
+.keycap .cap small { font: 500 .7rem/1 var(--f-mono); color: #7F938C; letter-spacing: 0; }
+.keycap .cap b { font-size: 1.5rem; line-height: 1; justify-self: end; margin-top: -2px; color: #9FB4AD; font-weight: 500; }
+.keycap.pressed .cap, .keycap:active .cap { transform: translateY(7px); box-shadow: 0 1px 0 #091015, 0 4px 10px rgba(0,0,0,.5), 0 0 0 1px rgba(61,245,167,.5) inset, 0 0 32px rgba(61,245,167,.35); color: var(--mint); }
+.keycap.pressed .cap b { color: var(--mint); }
+.keycap:hover .cap { color: #fff; }
+.keycap.sm { width: 108px; height: 70px; } .keycap.sm .cap { font-size: .85rem; padding: 0 13px; }
+
+/* ---------- hero ---------- */
+.hero { position: relative; overflow: hidden; padding-block: clamp(48px, 7vw, 92px) clamp(64px, 8vw, 104px); isolation: isolate; }
+.hero::before { content: ""; position: absolute; inset: 0; z-index: -2; background-image: radial-gradient(rgba(255,255,255,.075) 1px, transparent 1.2px); background-size: 28px 28px; -webkit-mask-image: radial-gradient(ellipse 75% 70% at 72% 42%, #000 0%, transparent 72%); mask-image: radial-gradient(ellipse 75% 70% at 72% 42%, #000 0%, transparent 72%); }
+.hero::after { content: ""; position: absolute; width: 780px; height: 780px; right: -160px; top: -120px; z-index: -1; background: radial-gradient(closest-side, rgba(61, 245, 167, .17), rgba(125, 240, 138, .06) 55%, transparent 72%); animation: drift 22s ease-in-out infinite alternate; pointer-events: none; }
+@keyframes drift { to { transform: translate(-70px, 60px) scale(1.08); } }
+.hero-grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: clamp(40px, 6vw, 80px); align-items: center; }
+.hero h1 { font-size: clamp(3.4rem, 8.2vw, 7rem); line-height: .93; letter-spacing: -.04em; font-variation-settings: "opsz" 96, "wdth" 86; font-weight: 800; }
+.hero h1 span { display: block; }
+.hero .lead { margin-top: 28px; }
+.hero-cta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 34px; }
+.facts { display: flex; flex-wrap: wrap; gap: 8px 26px; margin: 34px 0 0; padding: 0; list-style: none; color: var(--muted-d); font-size: .9rem; }
+.facts li { display: flex; align-items: center; gap: 9px; }
+.facts li::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--mint); box-shadow: 0 0 10px var(--mint); }
+.stage { position: relative; }
+.stage .keycap { position: absolute; left: -22px; bottom: 0; z-index: 3; }
+.stage-cap { display: flex; align-items: center; min-height: 54px; margin-top: 4px; padding-left: 118px; font-size: .84rem; color: var(--muted-d); }
+.hero .term-body { min-height: 218px; }
+
+/* compat strip */
+.strip { background: var(--ink-2); border-block: 1px solid var(--line-d); }
+.strip-in { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; margin: 0; }
+.strip-in > div { padding: 24px 28px; border-left: 1px solid var(--line-d); display: grid; gap: 6px; }
+.strip-in > div:first-child { border-left: 0; padding-left: 0; }
+.strip dt { font-size: .82rem; color: var(--muted-d); }
+.strip dd { margin: 0; font: 500 1rem var(--f-mono); color: var(--text-d); }
+
+/* ---------- statement + how ---------- */
+.statement { font: 600 clamp(1.9rem, 4.3vw, 3.5rem)/1.14 var(--f-display); letter-spacing: -.028em; font-variation-settings: "opsz" 64, "wdth" 94; max-width: 24em; text-wrap: balance; }
+.statement .w { color: #6C7E78; transition: color .35s ease; }
+.statement .w.on { color: var(--text); }
+.statement code { font: 500 .78em var(--f-mono); letter-spacing: 0; background: rgba(10,117,82,.1); padding: .05em .3em; border-radius: 6px; }
+.statement .w.on code { color: var(--leaf); }
+.steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; margin-top: clamp(56px, 7vw, 88px); border-top: 1px solid var(--line); }
+.step { padding: 30px 32px 6px 0; display: grid; gap: 14px; align-content: start; }
+.step + .step { padding-left: 32px; border-left: 1px solid var(--line); }
+.step .n { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; border: 1.5px solid var(--leaf); color: var(--leaf); font: 600 .85rem var(--f-mono); }
+.step h3 { font-size: 1.5rem; }
+.step p { color: var(--muted); max-width: 36ch; }
+.mini { font: 400 .84rem/1.7 var(--f-mono); background: #0A1217; color: #DCE7E3; border-radius: 12px; padding: 14px 16px; overflow-x: auto; white-space: pre; }
+.mini .ps { color: #6F8780; }
+
+/* ---------- playground ---------- */
+.try { display: grid; grid-template-columns: minmax(0, 4.6fr) minmax(0, 7.4fr); gap: clamp(28px, 5vw, 64px); align-items: start; }
+.ex-list { display: grid; gap: 8px; list-style: none; margin: 0; padding: 0; }
+.ex { width: 100%; text-align: left; display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: center; padding: 15px 18px; background: rgba(255,255,255,.035); color: var(--text-d); border: 1px solid var(--line-d); border-radius: 12px; font: 500 1rem/1.35 var(--f-body); cursor: pointer; transition: border-color .15s, background .15s, transform .15s; }
+.ex:hover { background: rgba(255,255,255,.07); border-color: rgba(255,255,255,.22); }
+.ex[aria-pressed="true"] { background: rgba(61, 245, 167, .09); border-color: rgba(61, 245, 167, .55); }
+.ex .tag { font: 500 .72rem var(--f-mono); color: var(--amber); border: 1px solid rgba(245,177,74,.4); padding: 3px 7px; border-radius: 6px; }
+.try-note { margin-top: 18px; font-size: .9rem; color: var(--muted-d); max-width: 44ch; }
+.try .term-body { min-height: 296px; }
+.try-keys { display: flex; flex-wrap: wrap; align-items: center; gap: 18px 26px; margin-top: 30px; }
+.try-keys p { font-size: .9rem; color: var(--muted-d); max-width: 30ch; }
+.alt-count { color: #7F938C; }
+
+/* ---------- plan mode ---------- */
+.plan-grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: clamp(32px, 6vw, 80px); align-items: start; }
+.plan-copy { position: sticky; top: calc(var(--nav-h) + 40px); display: grid; gap: 28px; }
+.plan-copy h2 { font-size: clamp(2rem, 4.2vw, 3.3rem); line-height: 1.05; }
+.points { display: grid; gap: 20px; margin: 0; padding: 0; list-style: none; }
+.points li { display: grid; gap: 4px; padding-left: 20px; border-left: 2px solid var(--line); }
+.points strong { font: 600 1.06rem var(--f-body); }
+.points span { color: var(--muted); font-size: .98rem; max-width: 46ch; }
+.plan-term .term-body { min-height: 590px; }
+.ph { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+.ph .g { color: var(--mint); }
+.ph b { color: #fff; font-weight: 600; }
+.pbar { margin: 4px 0 10px; font-size: .9em; letter-spacing: -.5px; white-space: nowrap; overflow: hidden; }
+.pbar .f { color: var(--mint); } .pbar .e { color: #33454D; }
+.cl { list-style: none; margin: 0 0 6px; padding: 0; }
+.cl li { display: grid; grid-template-columns: 1.6em 1.9em 1fr auto; gap: 0 4px; align-items: baseline; transition: color .3s; }
+.cl li .t { color: #8FA39C; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cl li.cur .t { color: #fff; font-weight: 600; }
+.cl li.done .t, .cl li.skipped .t { color: #5E736C; }
+.cl li .time { color: #5E736C; font-size: .88em; }
+.stepbox { border-top: 1px dashed rgba(255,255,255,.12); padding-top: 12px; margin-top: 6px; min-height: 300px; }
+.stepbox .ln { opacity: 0; transform: translateY(3px); animation: lnin .28s ease forwards; }
+@keyframes lnin { to { opacity: 1; transform: none; } }
+.stepbox .menu { color: #6F8780; margin-top: 4px; display: flex; flex-wrap: wrap; gap: 2px 12px; }
+.stepbox .menu span { white-space: nowrap; }
+.rule { color: #31444C; overflow: hidden; white-space: nowrap; }
+.dx { border-left: 2px solid var(--red); padding-left: 12px; color: #E7D2CF; margin: 6px 0; white-space: normal; }
+.replay { display: inline-flex; align-items: center; gap: 8px; background: none; border: 1px solid var(--line-d); color: #9FB4AD; border-radius: 8px; padding: 5px 11px; font: 500 .78rem var(--f-mono); cursor: pointer; }
+.replay:hover { color: #fff; border-color: rgba(255,255,255,.3); }
+
+/* ---------- features (bento) ---------- */
+.bento { display: grid; grid-template-columns: repeat(12, 1fr); gap: 16px; }
+.tile { background: var(--paper-2); border: 1px solid var(--line); border-radius: 20px; padding: 28px; display: grid; gap: 18px; align-content: start; min-width: 0; }
+.tile h3 { font-size: 1.4rem; line-height: 1.15; }
+.tile p { color: var(--muted); font-size: 1rem; max-width: 46ch; }
+.t-a { grid-column: span 7; } .t-b { grid-column: span 5; } .t-c { grid-column: span 4; } .t-d { grid-column: span 4; } .t-e { grid-column: span 4; }
+.t-f { grid-column: span 5; } .t-g { grid-column: span 7; }
+.tile.dark { background: var(--ink); border-color: var(--ink); color: var(--text-d); }
+.tile.dark p { color: var(--muted-d); }
+.tile .mini { font-size: .8rem; }
+.pair { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.pair .mini { display: grid; gap: 2px; align-content: start; }
+.pair .lab { font: 500 .72rem var(--f-body); color: #7F938C; margin-bottom: 4px; }
+.pill-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.pill { font: 500 .8rem var(--f-mono); padding: 6px 10px; border-radius: 8px; background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.12); color: #DCE7E3; }
+.pill.on { border-color: var(--mint); color: var(--mint); background: rgba(61,245,167,.1); }
+
+/* ---------- safety ---------- */
+.safety { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6.2fr); gap: clamp(32px, 6vw, 88px); align-items: start; }
+.safety h2 { font-size: clamp(2.2rem, 5vw, 4rem); line-height: 1; margin-bottom: 22px; }
+.rules { display: grid; gap: 0; margin: 38px 0 0; padding: 0; list-style: none; }
+.rules li { padding: 20px 0; border-top: 1px solid var(--line-d); display: grid; gap: 4px; }
+.rules li:last-child { border-bottom: 1px solid var(--line-d); }
+.rules strong { font: 600 1.1rem var(--f-body); color: #fff; }
+.rules span { color: var(--muted-d); max-width: 50ch; }
+.proofs { display: grid; gap: 20px; }
+.redact .row { display: grid; grid-template-columns: 5.2em 1fr; gap: 12px; }
+.redact .lbl { color: #6F8780; }
+.redact .val { position: relative; overflow-wrap: anywhere; }
+.redact .secret { background: rgba(255,127,115,.16); color: #FFB3AB; border-radius: 4px; padding: 0 3px; transition: background .5s, color .5s; }
+.redact.done .secret { background: rgba(61,245,167,.14); color: var(--mint); }
+.redact .scan { position: absolute; left: 0; top: 0; bottom: 0; width: 0; border-right: 2px solid var(--mint); background: linear-gradient(90deg, transparent, rgba(61,245,167,.18)); opacity: 0; }
+
+/* ---------- install ---------- */
+.install { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 4.6fr); gap: clamp(28px, 5vw, 64px); align-items: start; }
+.tabs { display: flex; flex-wrap: wrap; gap: 6px; padding: 5px; background: rgba(255,255,255,.05); border: 1px solid var(--line-d); border-radius: 14px; width: fit-content; max-width: 100%; margin-bottom: 28px; }
+.tab { background: none; border: 0; color: var(--muted-d); padding: 10px 16px; border-radius: 10px; font: 600 .95rem var(--f-body); cursor: pointer; transition: color .15s, background .15s; }
+.tab:hover { color: #fff; }
+.tab[aria-selected="true"] { background: var(--text-d); color: #07130E; }
+.osteps { list-style: none; margin: 0; padding: 0; display: grid; gap: 22px; counter-reset: s; }
+.osteps > li { counter-increment: s; display: grid; grid-template-columns: 34px 1fr; gap: 6px 16px; }
+.osteps > li::before { content: counter(s); grid-row: 1 / span 3; display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; border: 1.5px solid var(--mint); color: var(--mint); font: 600 .85rem var(--f-mono); margin-top: 2px; }
+.osteps h3 { font: 600 1.1rem var(--f-body); letter-spacing: 0; color: #fff; }
+.osteps p { color: var(--muted-d); font-size: .98rem; }
+.code { position: relative; margin-top: 6px; background: #0A1217; border: 1px solid rgba(255,255,255,.1); border-radius: 12px; }
+.code pre { margin: 0; padding: 15px 64px 15px 16px; overflow-x: auto; font-size: .86rem; line-height: 1.75; color: #DCE7E3; }
+.copy { position: absolute; top: 8px; right: 8px; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.12); color: #9FB4AD; border-radius: 8px; padding: 6px 10px; font: 500 .75rem var(--f-mono); cursor: pointer; transition: color .15s, border-color .15s, background .15s; }
+.copy:hover { color: #fff; border-color: rgba(255,255,255,.3); }
+.copy.done { color: #04140C; background: var(--mint); border-color: var(--mint); }
+.panel[hidden] { display: none; }
+.side { display: grid; gap: 18px; }
+.card-d { background: var(--ink-2); border: 1px solid var(--line-d); border-radius: 18px; padding: 24px; display: grid; gap: 16px; }
+.card-d h3 { font-size: 1.3rem; }
+.prov { display: grid; gap: 0; margin: 0; padding: 0; list-style: none; }
+.prov li { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; padding: 11px 0; border-top: 1px solid var(--line-d); font-size: .98rem; }
+.prov li:first-child { border-top: 0; }
+.prov em { font-style: normal; font: 500 .74rem var(--f-mono); color: var(--mint); border: 1px solid rgba(61,245,167,.4); border-radius: 6px; padding: 2px 7px; white-space: nowrap; }
+.prov span { color: var(--muted-d); font-size: .88rem; }
+
+/* ---------- faq ---------- */
+.faq { max-width: 860px; }
+.faq details { border-top: 1px solid var(--line); }
+.faq details:last-child { border-bottom: 1px solid var(--line); }
+.faq summary { list-style: none; cursor: pointer; display: flex; justify-content: space-between; gap: 20px; align-items: center; padding: 22px 0; font: 600 1.2rem/1.3 var(--f-display); letter-spacing: -.01em; font-variation-settings: "opsz" 24, "wdth" 96; }
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary::after { content: "+"; flex: none; display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; border: 1.5px solid var(--leaf); color: var(--leaf); font: 500 1.2rem/1 var(--f-mono); transition: transform .25s ease, background .2s, color .2s; }
+.faq details[open] summary::after { transform: rotate(135deg); background: var(--leaf); color: #fff; }
+.faq .ans { padding: 0 0 24px; color: var(--muted); max-width: 66ch; display: grid; gap: 12px; }
+.faq .ans code { font-size: .88em; background: rgba(10,117,82,.09); color: var(--leaf); padding: .1em .4em; border-radius: 5px; }
+
+/* ---------- cta + footer ---------- */
+.cta { text-align: left; overflow: hidden; isolation: isolate; }
+.cta::before { content: ""; position: absolute; inset: auto -10% -60% 30%; height: 520px; z-index: -1; background: radial-gradient(closest-side, rgba(61,245,167,.18), transparent 70%); }
+.cta h2 { font-size: clamp(2.6rem, 7vw, 5.6rem); line-height: .96; letter-spacing: -.04em; font-weight: 800; font-variation-settings: "opsz" 96, "wdth" 86; max-width: 12em; }
+.cta p { margin-top: 22px; }
+.footer { background: var(--ink); border-top: 1px solid var(--line-d); padding: 56px 0 40px; color: var(--muted-d); font-size: .95rem; }
+.foot-grid { display: grid; grid-template-columns: 1.6fr repeat(3, 1fr); gap: 36px; }
+.foot-grid h3 { font: 600 .9rem var(--f-body); letter-spacing: 0; color: #fff; margin-bottom: 14px; }
+.foot-grid ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.foot-grid a { text-decoration: none; } .foot-grid a:hover { color: #fff; }
+.soon { display: inline-flex; align-items: center; gap: 8px; color: #6F837C; cursor: default; }
+.soon em { font: 500 .68rem var(--f-mono); font-style: normal; border: 1px solid var(--line-d); border-radius: 6px; padding: 2px 6px; color: #7F938C; }
+.foot-brand p { margin-top: 14px; max-width: 30ch; }
+.legal { margin-top: 44px; padding-top: 22px; border-top: 1px solid var(--line-d); display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px; font-size: .86rem; }
+
+/* ---------- responsive ---------- */
+@media (max-width: 960px) {
+  .hero-grid, .try, .plan-grid, .safety, .install { grid-template-columns: 1fr; }
+  .plan-copy { position: static; }
+  .stage .keycap { position: relative; left: auto; display: block; margin: -22px 0 0 18px; }
+  .stage-cap { padding-left: 0; min-height: 0; margin-top: 12px; }
+  .strip-in { grid-template-columns: 1fr; }
+  .strip-in > div, .strip-in > div:first-child { border-left: 0; border-top: 1px solid var(--line-d); padding: 18px 0; }
+  .strip-in > div:first-child { border-top: 0; }
+  .steps { grid-template-columns: 1fr; }
+  .step, .step + .step { padding: 26px 0; border-left: 0; }
+  .step + .step { border-top: 1px solid var(--line); }
+  .t-a, .t-b, .t-c, .t-d, .t-e, .t-f, .t-g { grid-column: span 12; }
+  .foot-grid { grid-template-columns: 1fr 1fr; }
+  .foot-brand { grid-column: 1 / -1; }
+}
+@media (max-width: 860px) {
+  .nav ul { display: none; position: absolute; left: 0; right: 0; top: var(--nav-h); flex-direction: column; margin: 0; padding: 12px 20px 20px; background: rgba(9,16,21,.97); border-bottom: 1px solid var(--line-d); }
+  .nav.open ul { display: flex; }
+  .nav ul a { padding: 14px 8px; font-size: 1.05rem; }
+  .menu-btn { display: inline-flex; align-items: center; }
+  .nav .btn-sm { display: none; }
+}
+@media (max-width: 560px) {
+  .pair { grid-template-columns: 1fr; }
+  .tile { padding: 22px; }
+  .term-body { padding: 16px; }
+  .hero-cta .btn { flex: 1 1 100%; }
+  .cl li { grid-template-columns: 1.4em 1.7em 1fr auto; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
+}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute;overflow:hidden" aria-hidden="true" focusable="false">
+  {{MARK_DEFS}}
+  <symbol id="nmark" viewBox="0 0 512 512">{{MARK_BODY}}</symbol>
+</svg>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="nav" id="nav">
+  <div class="wrap nav-in">
+    <a class="brand" href="#top" aria-label="Newton, back to top"><svg viewBox="0 0 512 512" aria-hidden="true"><use href="#nmark"/></svg>newton</a>
+    <ul id="menu">
+      <li><a href="#how">How it works</a></li>
+      <li><a href="#try">Try it</a></li>
+      <li><a href="#plan">Plan mode</a></li>
+      <li><a href="#features">Features</a></li>
+      <li><a href="#safety">Safety</a></li>
+      <li><a href="#faq">FAQ</a></li>
+    </ul>
+    <a class="btn btn-primary btn-sm" href="#install">Install</a>
+    <button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="menu">Menu</button>
+  </div>
+</header>
+
+<main id="main">
+<!-- ============================== HERO ============================== -->
+<section class="hero" id="top" aria-labelledby="h1">
+  <div class="wrap hero-grid">
+    <div class="hero-copy">
+      <h1 id="h1"><span>Think it.</span><span>Tab it.</span><span>Done.</span></h1>
+      <p class="lead">Describe what you want in plain English and press Tab. Newton writes the exact shell command into your prompt. You read it, change it if you like, and press Enter.</p>
+      <div class="hero-cta">
+        <a class="btn btn-primary" href="#install">Install Newton</a>
+        <a class="btn btn-ghost" href="#plan">See plan mode</a>
+      </div>
+      <ul class="facts" aria-label="At a glance">
+        <li>MIT licensed</li>
+        <li>No telemetry</li>
+        <li>One file, needs Python 3.9+</li>
+      </ul>
+    </div>
+
+    <div class="stage">
+      <div class="term" id="heroTerm" role="img" aria-label="Demo: typing 'kill whatever is using port 3000' and pressing Tab turns the sentence into the command lsof -ti tcp:3000 | xargs kill, with a one-line explanation.">
+        <div class="term-bar" aria-hidden="true"><span class="tab">zsh</span><span class="where">~/projects/api</span></div>
+        <div class="term-body" aria-hidden="true">
+          <div class="line"><span class="ps">~/projects/api<span class="chev">❯</span></span><span class="typed"></span><span class="caret"></span></div>
+          <div class="result"><span class="note"><span class="mk">❯</span><span class="note-text"></span><span class="hints"></span></span><div class="flag-line"></div></div>
+        </div>
+      </div>
+      <button class="keycap" id="heroKey" type="button" aria-label="Press Tab to see another example"><span class="cap"><small>press</small>tab<b>⇥</b></span></button>
+      <p class="stage-cap">Example output. Press the key to see another request.</p>
+    </div>
+  </div>
+</section>
+
+<div class="strip">
+  <dl class="wrap strip-in">
+    <div><dt>Shells</dt><dd>zsh · bash · fish</dd></div>
+    <div><dt>AI</dt><dd>Claude · OpenAI-compatible · Ollama (free)</dd></div>
+    <div><dt>Systems</dt><dd>macOS · Linux · Chromebook · WSL</dd></div>
+  </dl>
+</div>
+
+<!-- ============================== STATEMENT + HOW ============================== -->
+<section class="band light" id="how" aria-labelledby="how-h">
+  <div class="wrap">
+    <h2 class="sr" id="how-h">How Newton works</h2>
+    <p class="statement" id="statement">You know what you want to do. You just don't remember whether it's <code>tar -xzvf</code> or <code>-zxvf</code>, which <code>find</code> flag means bigger than, or how <code>lsof</code> takes a port.</p>
+
+    <div class="steps">
+      <div class="step">
+        <span class="n" aria-hidden="true">1</span>
+        <h3>Describe it</h3>
+        <p>Write what you want in your prompt, the way you'd tell a colleague. No special syntax or quotes.</p>
+        <div class="mini" aria-label="Example prompt"><span class="ps">~ ❯</span> compress the logs folder</div>
+      </div>
+      <div class="step">
+        <span class="n" aria-hidden="true">2</span>
+        <h3>Press Tab</h3>
+        <p>Newton tells sentences from commands. Sentences go to your AI. Commands like <code>git ch</code> still get normal Tab completion.</p>
+        <div class="mini" aria-label="Example of normal completion"><span class="ps">~ ❯</span> git ch<span class="dim">⇥</span>  →  git checkout</div>
+      </div>
+      <div class="step">
+        <span class="n" aria-hidden="true">3</span>
+        <h3>Review, then Enter</h3>
+        <p>The command replaces your words and nothing has run. Edit it, press Tab for alternatives, or Shift+Tab to get your words back.</p>
+        <div class="mini" aria-label="Example result"><span class="ps">~ ❯</span> <span class="c-cmd">tar</span> <span class="c-flag">-czf</span> logs.tar.gz logs/</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== TRY IT ============================== -->
+<section class="band dark" id="try" aria-labelledby="try-h">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2 id="try-h">Try the Tab key.</h2>
+      <p class="lead">Pick a request and watch Newton answer. Press Tab again for other ways to do the same thing.</p>
+    </div>
+    <div class="try">
+      <div>
+        <ul class="ex-list" id="exList"></ul>
+        <p class="try-note">These are example results. Install Newton to use your own words, your own files and your own AI.</p>
+      </div>
+      <div>
+        <div class="term" id="tryTerm" role="img" aria-label="Interactive terminal showing the selected request and the command Newton writes for it.">
+          <div class="term-bar" aria-hidden="true"><span class="tab">zsh</span><span class="where">~/projects/api</span></div>
+          <div class="term-body" aria-hidden="true">
+            <div class="line"><span class="ps">~/projects/api<span class="chev">❯</span></span><span class="typed"></span><span class="caret"></span></div>
+            <div class="result"><span class="note"><span class="mk">❯</span><span class="note-text"></span><span class="hints"></span></span><div class="flag-line"></div></div>
+          </div>
+        </div>
+        <div class="try-keys">
+          <button class="keycap sm" id="tryTab" type="button" aria-label="Tab: next alternative"><span class="cap"><small>next</small>tab<b>⇥</b></span></button>
+          <button class="keycap sm" id="tryUndo" type="button" aria-label="Shift Tab: put my words back"><span class="cap"><small>undo</small>⇧ tab<b>⇤</b></span></button>
+          <p>Tab cycles through alternatives. Shift+Tab puts your original words back.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== PLAN MODE ============================== -->
+<section class="band light" id="plan" aria-labelledby="plan-h">
+  <div class="wrap plan-grid">
+    <div class="plan-copy">
+      <h2 id="plan-h">Plan mode turns a goal into a checklist you can follow.</h2>
+      <p class="lead">For anything bigger than one command, Newton drafts the steps, shows you each one before it runs, and helps fix what breaks. All in the same terminal tab.</p>
+      <ul class="points">
+        <li><strong>Preflight check</strong><span>Lists the programs the plan needs and whether they're installed, before step 1.</span></li>
+        <li><strong>One key per step</strong><span>Enter runs it. E edits it, S skips it, ? explains it, A asks a question, R revises the plan.</span></li>
+        <li><strong>Failures get diagnosed</strong><span>Newton reads the error, proposes a fix and retries. Risky fixes still wait for you.</span></li>
+        <li><strong>Undo and export</strong><span>Roll finished steps back, newest first, or export the plan as a shell script.</span></li>
+        <li><strong>Pause and resume</strong><span>Close the tab any time. <code>newton resume</code> picks up at the same step.</span></li>
+      </ul>
+    </div>
+    <div>
+      <div class="term plan-term" id="planTerm" role="img" aria-label="Animated demo of plan mode setting up a Python project with pytest and git. One step fails, Newton explains why and fixes it, and the plan completes in 11 seconds.">
+        <div class="term-bar" aria-hidden="true"><span class="tab">newton plan</span><span class="where">set up a python project with pytest and git</span><button class="replay" id="replay" type="button" aria-label="Replay the demo">↻ replay</button></div>
+        <div class="term-body" aria-hidden="true" id="planBody"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== FEATURES ============================== -->
+<section class="band white" id="features" aria-labelledby="feat-h">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2 id="feat-h">Everything you'd otherwise open a browser tab for.</h2>
+      <p class="lead">Newton sits in the shell you already use and knows the machine it's running on.</p>
+    </div>
+    <div class="bento">
+      <article class="tile t-a">
+        <h3>It knows your machine</h3>
+        <p>The same request becomes the right command for your system: BSD flags on macOS, GNU flags on Linux, and the loop syntax your shell actually speaks.</p>
+        <div class="pair" role="group" aria-label="Same request, different systems">
+          <div class="mini"><span class="lab">macOS · zsh</span><span><span class="c-cmd">sed</span> <span class="c-flag">-i</span> <span class="c-str">''</span> <span class="c-str">'s/foo/bar/g'</span> app.js</span><span>&nbsp;</span><span><span class="c-kw">for</span> f <span class="c-kw">in</span> *.jpeg<span class="c-op">;</span> <span class="c-kw">do</span> <span class="c-cmd">mv</span> <span class="c-str">"$f"</span> <span class="c-str">"${f%.jpeg}.jpg"</span><span class="c-op">;</span> <span class="c-kw">done</span></span></div>
+          <div class="mini"><span class="lab">Linux · fish</span><span><span class="c-cmd">sed</span> <span class="c-flag">-i</span> <span class="c-str">'s/foo/bar/g'</span> app.js</span><span>&nbsp;</span><span><span class="c-kw">for</span> f <span class="c-kw">in</span> *.jpeg<span class="c-op">;</span> <span class="c-cmd">mv</span> $f (<span class="c-cmd">string</span> replace .jpeg .jpg $f)<span class="c-op">;</span> <span class="c-kw">end</span></span></div>
+        </div>
+      </article>
+      <article class="tile dark t-b">
+        <h3>Tab still works normally</h3>
+        <p>Newton only steps in when your line reads like a sentence. Everything else completes as usual.</p>
+        <div class="mini"><span class="ps">~ ❯</span> git ch<span class="dim">⇥</span>   <span class="dim">→ checkout, cherry-pick</span>
+<span class="ps">~ ❯</span> list large files here<span class="dim">⇥</span>   <span class="dim">→ asks Newton</span></div>
+      </article>
+      <article class="tile dark t-c">
+        <h3>Alternatives on demand</h3>
+        <p>Press Tab again to cycle other ways to do it.</p>
+        <div class="pill-row"><span class="pill on">lsof -ti tcp:3000 | xargs kill</span><span class="pill">kill -9 $(lsof -ti :3000)</span><span class="pill">npx kill-port 3000</span></div>
+      </article>
+      <article class="tile t-d">
+        <h3>newton fix</h3>
+        <p>Your last command failed? Newton re-runs it, reads the real error and offers a fix.</p>
+        <div class="mini"><span class="ps">~ ❯</span> npm run build
+<span class="bad">Error: Cannot find module 'vite'</span>
+<span class="ps">~ ❯</span> newton fix
+<span class="dim">vite isn't installed in this project.</span>
+<span class="ok">❯</span> <span class="c-cmd">npm</span> install</div>
+      </article>
+      <article class="tile t-e">
+        <h3>newton commit</h3>
+        <p>Reads your staged changes and writes the message. You approve it before anything is committed.</p>
+        <div class="mini"><span class="dim">subject</span>  Retry failed uploads
+<span class="dim">body</span>     Network blips dropped files
+         silently. Retry up to 3 times.
+<span class="kbd-row"><kbd>⏎</kbd> commit  <kbd>e</kbd> edit  <kbd>q</kbd> cancel</span></div>
+      </article>
+      <article class="tile t-f">
+        <h3>Ask and chat, in the terminal</h3>
+        <p>Pipe anything in and get an answer next to your work. <code>!cmd</code> in chat runs a command and shows Newton the output.</p>
+        <div class="mini"><span class="ps">~ ❯</span> npm test 2&gt;&amp;1 | <span class="c-cmd">newton</span> ask what broke
+<span class="dim">The test imports ./utils, which was renamed to
+./helpers in your last commit. Update line 3.</span></div>
+      </article>
+      <article class="tile dark t-g">
+        <h3>Undo it, or take it with you</h3>
+        <p>Finished plans can be rolled back or exported as a script you can keep, share or run later.</p>
+        <div class="mini"><span class="ps">~ ❯</span> <span class="c-cmd">newton</span> plans undo
+<span class="ps">~ ❯</span> <span class="c-cmd">newton</span> plans export <span class="c-flag">-o</span> setup.sh
+<span class="ok">✓</span> wrote setup.sh  <span class="dim">asks before dangerous steps</span></div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== SAFETY ============================== -->
+<section class="band dark" id="safety" aria-labelledby="safe-h">
+  <div class="wrap safety">
+    <div>
+      <h2 id="safe-h">Newton writes. You decide.</h2>
+      <p class="lead">Nothing runs until you press Enter, and the checks that flag dangerous commands live on your machine, not in the AI.</p>
+      <ul class="rules">
+        <li><strong>Nothing runs on its own</strong><span>Suggestions land in your prompt. In plan mode every step is shown first, and destructive steps need a deliberate y, even in auto mode.</span></li>
+        <li><strong>Local safety rules always apply</strong><span>They flag <code>rm -rf</code>, sudo, force-pushes, <code>curl | sh</code>, disk writes and more, whatever the AI says.</span></li>
+        <li><strong>Secrets are scrubbed first</strong><span>API keys, tokens, passwords and private keys are replaced before anything is sent. Files that look like secrets are refused.</span></li>
+        <li><strong>Fully offline if you want it</strong><span>With Ollama, nothing leaves your computer. Newton has no telemetry.</span></li>
+      </ul>
+    </div>
+    <div class="proofs">
+      <div class="term" role="img" aria-label="A suggested command, rm -rf ~/projects/old, is flagged with the warning: recursively deletes files, there is no undo.">
+        <div class="term-bar" aria-hidden="true"><span class="tab">zsh</span><span class="where">a suggestion, flagged</span></div>
+        <div class="term-body" aria-hidden="true">
+          <div><span class="ps">~<span class="chev">❯</span></span><span class="c-cmd">rm</span> <span class="c-flag">-rf</span> ~/projects/old<span class="caret"></span></div>
+          <div class="result on"><span class="flag">▲ Recursively deletes files — there is no undo</span></div>
+          <div class="dim">Newton stops here. Pressing Enter is your call.</div>
+        </div>
+      </div>
+      <div class="term redact" id="redact" role="img" aria-label="Before sending, a line containing an API key is rewritten so the key becomes the word redacted.">
+        <div class="term-bar" aria-hidden="true"><span class="tab">before it's sent</span><span class="where">redaction</span></div>
+        <div class="term-body" aria-hidden="true">
+          <div class="row"><span class="lbl">you</span><span class="val">export API_KEY=<span class="secret" id="secretA">sk-ant-api03-EXAMPLEKEY0000</span></span></div>
+          <div class="row"><span class="lbl">sent</span><span class="val">export API_KEY=<span class="secret" id="secretB">sk-ant-api03-EXAMPLEKEY0000</span></span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== INSTALL ============================== -->
+<section class="band dark-2" id="install" aria-labelledby="inst-h">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2 id="inst-h">Install in about a minute.</h2>
+      <p class="lead">Newton is one file that needs Python 3.9 or newer. No pip, no virtual environment, no admin rights.</p>
+    </div>
+    <div class="install">
+      <div>
+        <div class="tabs" role="tablist" aria-label="Your system">
+          <button class="tab" role="tab" id="t-mac" aria-controls="p-mac" aria-selected="true" type="button">macOS</button>
+          <button class="tab" role="tab" id="t-linux" aria-controls="p-linux" aria-selected="false" tabindex="-1" type="button">Linux</button>
+          <button class="tab" role="tab" id="t-chromeos" aria-controls="p-chromeos" aria-selected="false" tabindex="-1" type="button">Chromebook</button>
+          <button class="tab" role="tab" id="t-wsl" aria-controls="p-wsl" aria-selected="false" tabindex="-1" type="button">Windows (WSL)</button>
+        </div>
+
+        <div class="panel" id="p-mac" role="tabpanel" aria-labelledby="t-mac">
+          <ol class="osteps">
+            <li><h3>Get newton.zip</h3><p>Public downloads open soon. Use the zip you were given for now.</p></li>
+            <li><h3>Unzip and run the installer</h3><p>In Terminal. macOS includes Python 3; it will offer to install developer tools if it's missing.</p>
+              <div class="code"><pre>cd ~/Downloads
+unzip newton.zip
+cd newton
+sh install.sh</pre><button class="copy" type="button" data-copy>Copy</button></div></li>
+            <li><h3>Open a new terminal</h3><p>Type a sentence and press Tab. zsh is the macOS default and works best.</p></li>
+          </ol>
+        </div>
+        <div class="panel" id="p-linux" role="tabpanel" aria-labelledby="t-linux" hidden>
+          <ol class="osteps">
+            <li><h3>Get newton.zip</h3><p>Public downloads open soon. Use the zip you were given for now.</p></li>
+            <li><h3>Unzip and run the installer</h3><p>Works on any distro with <code>python3</code>. If it's missing, the installer prints the exact command for yours.</p>
+              <div class="code"><pre>cd ~/Downloads
+unzip newton.zip
+cd newton
+sh install.sh</pre><button class="copy" type="button" data-copy>Copy</button></div></li>
+            <li><h3>Open a new terminal</h3><p>zsh, bash 4+ and fish are supported.</p></li>
+          </ol>
+        </div>
+        <div class="panel" id="p-chromeos" role="tabpanel" aria-labelledby="t-chromeos" hidden>
+          <ol class="osteps">
+            <li><h3>Turn on Linux</h3><p>Settings → About ChromeOS → Developers → Linux development environment → Turn on. Then open the Terminal app.</p></li>
+            <li><h3>Move the zip into Linux files</h3><p>In the Files app, drag <code>newton.zip</code> from My files › Downloads into Linux files. That folder is <code>~</code> in the terminal.</p></li>
+            <li><h3>Install what's missing, then Newton</h3><p>The first line is only needed if <code>unzip</code> or <code>python3</code> isn't there yet.</p>
+              <div class="code"><pre>sudo apt update &amp;&amp; sudo apt install -y unzip python3
+cd ~
+unzip newton.zip
+cd newton
+sh install.sh</pre><button class="copy" type="button" data-copy>Copy</button></div></li>
+          </ol>
+        </div>
+        <div class="panel" id="p-wsl" role="tabpanel" aria-labelledby="t-wsl" hidden>
+          <ol class="osteps">
+            <li><h3>Set up WSL</h3><p>In PowerShell as administrator, install Ubuntu, restart, then open the Ubuntu app.</p>
+              <div class="code"><pre>wsl --install</pre><button class="copy" type="button" data-copy>Copy</button></div></li>
+            <li><h3>Copy the zip into WSL and install</h3><p>Replace <code>YOU</code> with your Windows user name.</p>
+              <div class="code"><pre>cp /mnt/c/Users/YOU/Downloads/newton.zip ~
+cd ~
+sudo apt update &amp;&amp; sudo apt install -y unzip python3
+unzip newton.zip
+cd newton
+sh install.sh</pre><button class="copy" type="button" data-copy>Copy</button></div></li>
+            <li><h3>Use it inside WSL</h3><p>Newton runs in the Linux shell, not in PowerShell.</p></li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="side">
+        <div class="card-d">
+          <h3>Pick an AI during setup</h3>
+          <ul class="prov">
+            <li><span>Claude (Anthropic API)<br><span>Best answers. Needs an API key and bills by use.</span></span></li>
+            <li><span>OpenAI-compatible<br><span>Any compatible endpoint and key.</span></span></li>
+            <li><span>Ollama, on your computer<br><span>Offline and free. Slower and less accurate.</span></span><em>free</em></li>
+          </ul>
+          <div class="code"><pre>ollama pull llama3.1
+newton config provider ollama
+newton config model llama3.1</pre><button class="copy" type="button" data-copy>Copy</button></div>
+        </div>
+        <div class="card-d">
+          <h3>Update or remove it</h3>
+          <div class="code"><pre>newton update
+newton uninstall</pre><button class="copy" type="button" data-copy>Copy</button></div>
+          <p class="dim" style="font-size:.9rem">Updates are built and tested before they replace your copy. Uninstall only removes Newton's own lines from your shell config.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== FAQ ============================== -->
+<section class="band light" id="faq" aria-labelledby="faq-h">
+  <div class="wrap">
+    <div class="sec-head"><h2 id="faq-h">Questions people ask first.</h2></div>
+    <div class="faq">
+      <details name="faq" open><summary>Does Newton run commands for me?</summary><div class="ans"><p>No. Tab puts the command in your prompt and stops. Plan mode runs a step only after you approve it, and destructive steps need an explicit <code>y</code>.</p></div></details>
+      <details name="faq"><summary>Is it free?</summary><div class="ans"><p>Newton is free and MIT licensed. Your AI provider may charge: Claude and OpenAI-compatible services bill for usage. Ollama runs models on your own computer at no cost.</p></div></details>
+      <details name="faq"><summary>What does Newton send to the AI?</summary><div class="ans"><p>For Tab suggestions: your request plus a short description of your setup (OS, shell, current folder, project type, installed tool names and top-level file names, which you can turn off). Never file contents, environment variables or shell history.</p><p>Plan mode, ask, fix and commit send more, only when you use them: for example a failed step's output or your staged diff. Secrets are redacted first.</p></div></details>
+      <details name="faq"><summary>Which shells and systems work?</summary><div class="ans"><p>zsh, bash 4 or newer and fish, on macOS and Linux, including a Chromebook's Linux terminal. Windows works through WSL. macOS ships bash 3.2, so use zsh (the default) or install a newer bash.</p></div></details>
+      <details name="faq"><summary>A local model gave me a wrong command.</summary><div class="ans"><p>Small local models make more mistakes than Claude. Try a larger model such as <code>qwen2.5:14b</code> if your computer can run it, read the command before pressing Enter (Newton flags the dangerous ones), or paste it into <code>newton explain</code> for a flag-by-flag breakdown.</p></div></details>
+      <details name="faq"><summary>Will it change my shell config?</summary><div class="ans"><p>Only for shells you already use, and only inside a marked block. <code>newton uninstall</code> removes that block and any lines older versions added.</p></div></details>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== CTA ============================== -->
+<section class="band dark cta" aria-labelledby="cta-h">
+  <div class="wrap">
+    <h2 id="cta-h">Put Newton in your prompt.</h2>
+    <p class="lead">One file, a minute to install, and every command you can describe is one Tab away.</p>
+    <div class="hero-cta">
+      <a class="btn btn-primary" href="#install">Install Newton</a>
+      <a class="btn btn-ghost" href="#how">See how it works</a>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="footer">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <a class="brand" href="#top" aria-label="Newton, back to top"><svg viewBox="0 0 512 512" aria-hidden="true"><use href="#nmark"/></svg>newton</a>
+        <p>Think it. Tab it. Done.</p>
+      </div>
+      <div><h3>Product</h3><ul><li><a href="#how">How it works</a></li><li><a href="#try">Try it</a></li><li><a href="#plan">Plan mode</a></li><li><a href="#safety">Safety</a></li><li><a href="#install">Install</a></li></ul></div>
+      <div><h3>Company</h3><ul><li><span class="soon">About <em>Soon</em></span></li><li><span class="soon">Team <em>Soon</em></span></li><li><span class="soon">Invest <em>Soon</em></span></li><li><span class="soon">Donate <em>Soon</em></span></li></ul></div>
+      <div><h3>Resources</h3><ul><li><span class="soon">Download <em>Soon</em></span></li><li><span class="soon">Documentation <em>Soon</em></span></li><li><span class="soon">Company video <em>Soon</em></span></li><li><a href="#faq">FAQ</a></li></ul></div>
+    </div>
+    <div class="legal"><span>© 2026 Newton. Released under the MIT license.</span><span>Built for people who live in the terminal.</span></div>
+  </div>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+  const $ = (s, r) => (r || document).querySelector(s);
+  const $$ = (s, r) => Array.from((r || document).querySelectorAll(s));
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const CANCEL = { cancelled: true };
+  const sleep = (ms) => new Promise((r) => setTimeout(r, reduce ? 0 : ms));
+  const esc = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+  /* ---------- command syntax colouring ---------- */
+  const KW = new Set(["for", "in", "do", "done", "then", "fi", "if", "else", "end"]);
+  function hl(cmd) {
+    const re = /\s+|"(?:[^"\\]|\\.)*"?|'(?:[^'\\]|\\.)*'?|\|\||&&|[|;]|\$\([^)]*\)?|\$\{[^}]*\}?|\$\w+|--?[A-Za-z][\w-]*|\S+/g;
+    let out = "", atCmd = true, m;
+    while ((m = re.exec(cmd))) {
+      const t = m[0], e = esc(t);
+      if (/^\s+$/.test(t)) { out += e; continue; }
+      if (t === "|" || t === "||" || t === "&&" || t === ";") { out += '<span class="c-op">' + e + "</span>"; atCmd = true; continue; }
+      if (t[0] === '"' || t[0] === "'") { out += '<span class="c-str">' + e + "</span>"; atCmd = false; continue; }
+      if (t[0] === "$") { out += '<span class="c-var">' + e + "</span>"; atCmd = false; continue; }
+      if (t[0] === "-" && t.length > 1) { out += '<span class="c-flag">' + e + "</span>"; continue; }
+      if (KW.has(t)) { out += '<span class="c-kw">' + e + "</span>"; if (t === "do" || t === "then" || t === "else") atCmd = true; else if (t === "for") atCmd = false; continue; }
+      if (atCmd) { out += '<span class="c-cmd">' + e + "</span>"; atCmd = false; } else out += e;
+    }
+    return out;
+  }
+
+  /* ---------- example data (illustrative results) ---------- */
+  const EX = [
+    { say: "kill whatever is using port 3000", cmd: "lsof -ti tcp:3000 | xargs kill", note: "Finds the process listening on port 3000 and stops it.", alts: ["kill -9 $(lsof -ti :3000)", "npx kill-port 3000"] },
+    { say: "find every jpg modified this week", cmd: 'find . -name "*.jpg" -mtime -7', note: "Lists .jpg files changed in the last 7 days.", alts: ['find . -iname "*.jpg" -mtime -7 -print'] },
+    { say: "compress the logs folder", cmd: "tar -czf logs.tar.gz logs/", note: "Packs the logs folder into a gzipped archive.", alts: ["zip -r logs.zip logs/"] },
+    { say: "show the 10 biggest files in this folder", cmd: "ls -lSh | head -10", note: "Lists files by size, largest first, and keeps the top ten.", alts: ["du -ah . | sort -rh | head -10"] },
+    { say: "undo my last commit but keep the changes", cmd: "git reset --soft HEAD~1", note: "Moves the branch back one commit and keeps your changes staged.", alts: ["git reset --mixed HEAD~1"] },
+    { say: "rename all .jpeg files to .jpg", cmd: 'for f in *.jpeg; do mv "$f" "${f%.jpeg}.jpg"; done', note: "Renames each .jpeg file in this folder to .jpg.", alts: [] },
+    { say: "delete every node_modules folder under here", cmd: "find . -name node_modules -type d -prune -exec rm -rf {} +", note: "Finds node_modules folders and deletes them.", warn: "Recursively deletes files — there is no undo", alts: ["npx npkill"], tag: "flagged" }
+  ];
+
+  /* ---------- a terminal that types a sentence, presses Tab, shows the command ---------- */
+  function makeTerm(root, keycap, undoCap) {
+    const typed = $(".typed", root), note = $(".note-text", root), hints = $(".hints", root), flag = $(".flag-line", root), res = $(".result", root);
+    let token = 0, ex = null, alt = 0, phase = "idle";
+    const live = (t) => { if (t !== token) throw CANCEL; };
+    async function type(text, speed, t, colour) {
+      typed.innerHTML = "";
+      if (reduce) { typed.innerHTML = colour ? hl(text) : esc(text); return; }
+      for (let i = 1; i <= text.length; i++) {
+        live(t);
+        typed.innerHTML = colour ? hl(text.slice(0, i)) : esc(text.slice(0, i));
+        await sleep(speed * (0.55 + Math.random() * 0.9));
+      }
+    }
+    function showResult() {
+      note.textContent = ex.note;
+      flag.innerHTML = ex.warn ? '<span class="flag">▲ ' + esc(ex.warn) + "</span>" : "";
+      renderHints();
+      res.classList.add("on");
+    }
+    function renderHints() {
+      const n = ex.alts.length;
+      hints.innerHTML = n ? (alt === 0 ? "⇥ " + n + " more" : '<span class="alt-count">alternative ' + alt + " of " + n + "</span>") + " · ⇧⇥ undo" : "⇧⇥ undo";
+    }
+    async function press(t) {
+      if (keycap) { keycap.classList.add("pressed"); }
+      root.querySelector(".term-body").classList.remove("flash");
+      void root.offsetWidth;
+      root.querySelector(".term-body").classList.add("flash");
+      await sleep(190); live(t);
+      if (keycap) keycap.classList.remove("pressed");
+    }
+    const api = {
+      async play(e, auto) {
+        const t = ++token; ex = e; alt = 0; phase = "typing";
+        res.classList.remove("on");
+        try {
+          await type(e.say, 34, t, false);
+          if (auto !== false) {
+            await sleep(520); live(t);
+            await press(t);
+            await api.generate(t);
+          } else phase = "sentence";
+          return true;
+        } catch (err) { if (err !== CANCEL) throw err; return false; }
+      },
+      show(e) {                // a finished example, drawn instantly (the page's resting state)
+        token++; ex = e; alt = 0; phase = "cmd";
+        typed.innerHTML = hl(e.cmd); showResult();
+      },
+      async generate(t) {
+        t = t || ++token; alt = 0; phase = "cmd";
+        await type(ex.cmd, 11, t, true); live(t);
+        showResult();
+      },
+      async tab() {            // keycap pressed by the visitor
+        const t = ++token;
+        try {
+          if (phase === "cmd" && ex && ex.alts.length) {
+            await press(t); alt = (alt + 1) % (ex.alts.length + 1);
+            typed.innerHTML = hl(alt === 0 ? ex.cmd : ex.alts[alt - 1]); renderHints();
+          } else if (phase === "sentence" && ex) { await press(t); await api.generate(t); }
+          else if (phase === "cmd") { await press(t); }
+        } catch (err) { if (err !== CANCEL) throw err; }
+      },
+      async undo() {
+        const t = ++token;
+        if (!ex) return;
+        try {
+          const cap = undoCap || keycap;
+          if (cap) cap.classList.add("pressed");
+          await sleep(170); live(t);
+          if (cap) cap.classList.remove("pressed");
+          res.classList.remove("on"); phase = "sentence"; alt = 0;
+          typed.textContent = ex.say;
+        } catch (err) { if (err !== CANCEL) throw err; }
+      },
+      stop() { token++; }
+    };
+    return api;
+  }
+
+  /* ---------- hero loop ---------- */
+  (function hero() {
+    const root = $("#heroTerm"), key = $("#heroKey");
+    const term = makeTerm(root, key);
+    let i = 1, timer = 0, visible = true;
+    term.show(EX[0]);                                   // resting state: a finished example, not an empty prompt
+    function next() {
+      clearTimeout(timer);
+      if (!visible || document.hidden) return;
+      const ex = EX[i % 4];                             // the hero rotates the four friendliest examples
+      i++;
+      term.play(ex).then((done) => { if (done && !reduce) timer = setTimeout(next, 3400); });
+    }
+    function schedule(ms) { clearTimeout(timer); if (!reduce) timer = setTimeout(next, ms); }
+    key.addEventListener("click", () => { clearTimeout(timer); term.stop(); visible = true; next(); });
+    new IntersectionObserver((es) => {
+      visible = es[0].isIntersecting;
+      if (visible) schedule(2600); else { clearTimeout(timer); term.stop(); }
+    }, { threshold: 0.2 }).observe(root);
+    document.addEventListener("visibilitychange", () => { if (document.hidden) { clearTimeout(timer); term.stop(); } else if (visible) schedule(1200); });
+  })();
+
+  /* ---------- playground ---------- */
+  (function playground() {
+    const list = $("#exList"), root = $("#tryTerm");
+    const tabKey = $("#tryTab"), undoKey = $("#tryUndo");
+    const term = makeTerm(root, tabKey, undoKey);
+    EX.forEach((e, n) => {
+      const li = document.createElement("li");
+      const b = document.createElement("button");
+      b.type = "button"; b.className = "ex"; b.setAttribute("aria-pressed", "false");
+      b.innerHTML = "<span>" + esc(e.say) + "</span>" + (e.tag ? '<span class="tag">' + e.tag + "</span>" : "");
+      b.addEventListener("click", () => {
+        $$(".ex", list).forEach((x) => x.setAttribute("aria-pressed", "false"));
+        b.setAttribute("aria-pressed", "true");
+        term.play(e);
+      });
+      li.appendChild(b); list.appendChild(li);
+    });
+    const first = $(".ex", list);
+    first.setAttribute("aria-pressed", "true");
+    term.show(EX[0]);
+    tabKey.addEventListener("click", () => term.tab());
+    undoKey.addEventListener("click", () => term.undo());
+  })();
+
+  /* ---------- statement: words light up as you scroll ---------- */
+  (function statement() {
+    const el = $("#statement");
+    const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+    const nodes = []; while (walker.nextNode()) nodes.push(walker.currentNode);
+    nodes.forEach((n) => {
+      if (n.parentElement.tagName === "CODE") return;
+      const frag = document.createDocumentFragment();
+      n.textContent.split(/(\s+)/).forEach((p) => {
+        if (!p) return;
+        if (/^\s+$/.test(p)) { frag.appendChild(document.createTextNode(p)); return; }
+        const s = document.createElement("span"); s.className = "w"; s.textContent = p; frag.appendChild(s);
+      });
+      n.parentNode.replaceChild(frag, n);
+    });
+    $$("code", el).forEach((c) => { const s = document.createElement("span"); s.className = "w"; c.parentNode.insertBefore(s, c); s.appendChild(c); });
+    const words = $$(".w", el);
+    function update() {
+      let p = 1;
+      if (!reduce) { const r = el.getBoundingClientRect(), vh = window.innerHeight; p = Math.min(1, Math.max(0, (vh * 0.9 - r.top) / (r.height + vh * 0.28))); }
+      const n = Math.round(p * words.length);
+      words.forEach((w, i) => w.classList.toggle("on", i < n));
+    }
+    update(); window.addEventListener("scroll", update, { passive: true }); window.addEventListener("resize", update);
+  })();
+
+  /* ---------- plan mode: a scripted run, with one failure ---------- */
+  (function plan() {
+    const body = $("#planBody");
+    const STEPS = [
+      { t: "Create the project folder", cmd: "mkdir -p demo && cd demo", secs: 0 },
+      { t: "Make a virtual environment", cmd: "python3 -m venv .venv", secs: 3 },
+      { t: "Install pytest", cmd: "pip install pytest", secs: 7, fail: true },
+      { t: "Add a first test", cmd: "printf 'def test_ok():\\n    assert 1 + 1 == 2\\n' > test_app.py", secs: 0 },
+      { t: "Initialise git", cmd: 'git init -q && git add . && git commit -qm "first commit"', secs: 1 }
+    ];
+    const N = STEPS.length, BAR = 28;
+    let st = [], token = 0, headerGoal = "Python project";
+    const icon = (s, cur) => s === "failed" ? '<span class="bad">✗</span>' : cur ? '<span class="ok">▸</span>' : (s === "done" ? '<span class="ok">✓</span>' : '<span class="dim">○</span>');
+    function drawTop(cur, label) {
+      const done = st.filter((s) => s === "done").length;
+      const pct = Math.round((100 * done) / N), f = Math.round((BAR * done) / N);
+      const where = label || ("step " + Math.min(cur + 1, N) + " of " + N + " · " + pct + "%");
+      let h = '<div class="ph"><span><span class="g">◆</span> <b>' + headerGoal + '</b></span><span class="dim">' + where + '</span></div>';
+      h += '<div class="pbar"><span class="f">' + "━".repeat(f) + '</span><span class="e">' + "─".repeat(BAR - f) + "</span></div>";
+      h += '<ul class="cl">';
+      STEPS.forEach((s, i) => {
+        const isCur = i === cur && st[i] !== "done";
+        const tm = st[i] === "done" && s.secs >= 1 ? s.secs + "s" : "";
+        h += '<li class="' + (isCur ? "cur " : "") + (st[i] || "") + '"><span>' + icon(st[i], isCur) + '</span><span class="dim">' + (i + 1) + '</span><span class="t">' + esc(s.t) + '</span><span class="time">' + tm + "</span></li>";
+      });
+      h += "</ul>";
+      return h;
+    }
+    function render(cur, label) {
+      body.innerHTML = drawTop(cur, label) + '<div class="stepbox" id="sb"></div>';
+      return $("#sb");
+    }
+    const menu = (items) => '<div class="menu">' + items.map((m) => '<span><kbd data-k="' + m[0] + '">' + m[0] + "</kbd> " + m[1] + "</span>").join("") + "</div>";
+    const RUN = [["⏎", "run"], ["e", "edit"], ["s", "skip"], ["?", "explain"], ["a", "ask"], ["r", "revise"], ["q", "pause"]];
+    async function hit(box, k, w) { const el = $('kbd[data-k="' + k + '"]', box); if (el) el.classList.add("hit"); await w(260); }
+    function line(box, html) { const d = document.createElement("div"); d.className = "ln"; d.innerHTML = html; box.appendChild(d); return d; }
+    const rule = (label) => '<div class="rule">─ ' + label + " " + "─".repeat(60) + "</div>";
+
+    function finalState() {
+      st = STEPS.map(() => "done");
+      body.innerHTML = drawTop(N, N + " of " + N + " done") + '<div class="stepbox"></div>';
+      const box = $(".stepbox", body);
+      box.innerHTML = '<div><span class="ok">✓</span> <b style="color:#fff">Plan complete</b> <span class="dim">— Python project</span></div><div class="dim">5 steps · 5 done · 11s</div><br><div><span class="ok">next</span> run <span class="c-cmd">pytest</span> inside demo/</div><br><div class="dim">changed your mind? roll it back with <span class="c-cmd">newton plans undo</span></div>';
+    }
+
+    async function run() {
+      const t = ++token, live = () => t === token;
+      const w = async (ms) => { if (!live()) throw CANCEL; await sleep(ms); if (!live()) throw CANCEL; };
+      st = STEPS.map(() => "");
+      try {
+        let box = render(-1, "ready");
+        line(box, '<span class="dim">needs</span>  <span class="ok">✓</span> python3   <span class="ok">✓</span> git');
+        line(box, '<span class="dim">5 steps · you approve each one before it runs</span>');
+        line(box, menu([["⏎", "start"], ["r", "revise first"], ["q", "cancel"]]));
+        await w(1900); await hit(box, "⏎", w);
+        for (let i = 0; i < N; i++) {
+          const s = STEPS[i];
+          box = render(i);
+          line(box, '<b style="color:#fff">Step ' + (i + 1) + '</b> <span class="dim">of ' + N + '</span>  <b style="color:#fff">' + esc(s.t) + "</b>");
+          line(box, '<span class="ok">❯</span> ' + hl(s.cmd));
+          line(box, menu(RUN));
+          await w(1500); await hit(box, "⏎", w);
+          line(box, rule("running"));
+          await w(i === 1 ? 900 : 600);
+          if (s.fail) {
+            line(box, '<span class="bad">error: externally-managed-environment</span>');
+            line(box, '<span class="dim">× This environment is externally managed</span>');
+            await w(700);
+            line(box, '<span class="bad">✗ Step failed</span> <span class="dim">(exit 1)</span>');
+            st[i] = "failed";
+            await w(500);
+            line(box, '<span class="dim">⠋ Newton is working out what went wrong…</span>');
+            await w(1300);
+            box = render(i);
+            line(box, '<span class="bad">✗ Step failed</span> <span class="dim">(exit 1)</span>');
+            line(box, '<div class="dx">pip is installing into the system Python, which is locked. Use the project\'s own pip instead.</div>');
+            line(box, '<b style="color:#fff">Suggested fix</b> <span class="dim">Use the venv\'s pip</span>');
+            line(box, '<span class="ok">❯</span> ' + hl(".venv/bin/pip install pytest"));
+            line(box, menu([["⏎", "run fix"], ["e", "edit fix"], ["r", "retry as-is"], ["s", "skip step"], ["a", "ask"], ["q", "pause"]]));
+            await w(2200); await hit(box, "⏎", w);
+            line(box, rule("running"));
+            await w(900);
+            line(box, '<span class="dim">Successfully installed pytest</span>');
+            await w(500);
+            line(box, '<span class="ok">✓ fixed — moving on</span>');
+          } else {
+            line(box, '<span class="ok">✓ done</span> <span class="dim">in ' + s.secs + "s</span>");
+          }
+          st[i] = "done";
+          await w(900);
+        }
+        box = render(N, N + " of " + N + " done");
+        line(box, '<div><span class="ok">✓</span> <b style="color:#fff">Plan complete</b> <span class="dim">— Python project</span></div>');
+        line(box, '<div class="dim">5 steps · 5 done · 11s</div>');
+        line(box, "<br><div><span class=\"ok\">next</span> run <span class=\"c-cmd\">pytest</span> inside demo/</div>");
+        line(box, '<br><div class="dim">changed your mind? roll it back with <span class="c-cmd">newton plans undo</span></div>');
+      } catch (e) { if (e !== CANCEL) throw e; }
+    }
+    function start() { if (reduce) { finalState(); return; } run(); }
+    let seen = false;
+    new IntersectionObserver((es) => { if (es[0].isIntersecting && !seen) { seen = true; start(); } }, { threshold: 0.3 }).observe($("#planTerm"));
+    $("#replay").addEventListener("click", () => { seen = true; start(); });
+    // resting state before it scrolls into view: the finished plan
+    finalState();
+  })();
+
+  /* ---------- redaction demo ---------- */
+  (function redaction() {
+    const root = $("#redact"), b = $("#secretB"), key = b.textContent;
+    b.textContent = "[redacted]"; root.classList.add("done");      // resting state: already redacted
+    if (reduce) return;
+    let ran = false;
+    new IntersectionObserver(async (es, o) => {
+      if (!es[0].isIntersecting || ran) return;
+      ran = true; o.disconnect();
+      b.textContent = key; root.classList.remove("done");
+      await sleep(900);
+      for (let i = 0; i <= key.length; i++) { b.textContent = "•".repeat(i) + key.slice(i); await sleep(26); }
+      b.textContent = "[redacted]"; root.classList.add("done");
+    }, { threshold: 0.7 }).observe(root);
+  })();
+
+  /* ---------- install tabs + copy ---------- */
+  (function install() {
+    const tabs = $$('[role="tab"]');
+    function select(t) {
+      tabs.forEach((x) => { const on = x === t; x.setAttribute("aria-selected", on); x.tabIndex = on ? 0 : -1; $("#" + x.getAttribute("aria-controls")).hidden = !on; });
+      try { sessionStorage.setItem("os", t.id); } catch (e) {}
+    }
+    tabs.forEach((t, i) => {
+      t.addEventListener("click", () => select(t));
+      t.addEventListener("keydown", (e) => {
+        const k = { ArrowRight: 1, ArrowLeft: -1 }[e.key];
+        if (!k) return; e.preventDefault();
+        const n = tabs[(i + k + tabs.length) % tabs.length]; select(n); n.focus();
+      });
+    });
+    let saved = null; try { saved = sessionStorage.getItem("os"); } catch (e) {}
+    if (!saved) { const p = (navigator.userAgent || "") + " " + (navigator.platform || ""); saved = /CrOS/i.test(p) ? "t-chromeos" : /Mac/i.test(p) ? "t-mac" : /Win/i.test(p) ? "t-wsl" : /Linux/i.test(p) ? "t-linux" : "t-mac"; }
+    const start = document.getElementById(saved); if (start) select(start);
+
+    $$("[data-copy]").forEach((btn) => btn.addEventListener("click", async () => {
+      const pre = btn.parentElement.querySelector("pre"), text = pre.textContent.trim();
+      let ok = false;
+      try { await navigator.clipboard.writeText(text); ok = true; } catch (e) {
+        try { const r = document.createRange(); r.selectNodeContents(pre); const s = getSelection(); s.removeAllRanges(); s.addRange(r); ok = document.execCommand("copy"); } catch (e2) {}
+      }
+      btn.textContent = ok ? "Copied" : "Select and copy"; btn.classList.toggle("done", ok);
+      setTimeout(() => { btn.textContent = "Copy"; btn.classList.remove("done"); }, 1800);
+    }));
+  })();
+
+  /* ---------- mobile menu ---------- */
+  (function menu() {
+    const nav = $("#nav"), btn = $("#menuBtn");
+    btn.addEventListener("click", () => { const o = nav.classList.toggle("open"); btn.setAttribute("aria-expanded", o); });
+    $$("#menu a").forEach((a) => a.addEventListener("click", () => { nav.classList.remove("open"); btn.setAttribute("aria-expanded", "false"); }));
+  })();
+})();
+</script>
+</body>
+</html>

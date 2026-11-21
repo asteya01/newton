@@ -4,7 +4,7 @@ style=re.search(r'<style>(.*?)</style>',v2,re.S).group(1)
 defs=open('mark_defs.txt').read(); body=open('mark_body.txt').read()
 if not defs.strip().startswith('<defs'): defs='<defs>'+defs+'</defs>'
 z=open('newton.zip','rb').read(); sha=hashlib.sha256(z).hexdigest(); kb=round(len(z)/1024)
-VER="2.2.1"
+VER="2.3.0"
 extra='''
 .dl-hero{position:relative;overflow:hidden;isolation:isolate;padding-block:calc(var(--nav-h) + 90px) 90px}
 .dl-grid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:clamp(28px,5vw,72px);align-items:center}
@@ -40,7 +40,7 @@ extra='''
 '''
 nav='''<header class="nav" id="nav"><div class="nav-in">
 <a class="brand" href="index.html" aria-label="Newton home"><svg viewBox="0 0 512 512" aria-hidden="true"><use href="#nmark"/></svg>newton</a>
-<ul id="menu"><li><a href="index.html#how">How it works</a></li><li><a href="index.html#try">Try it</a></li><li><a href="index.html#plan">Plan mode</a></li><li><a href="index.html#features">Features</a></li><li><a href="index.html#safety">Safety</a></li><li><a href="download.html" class="cur" aria-current="page">Download</a></li><li><a href="index.html#faq">FAQ</a></li></ul>
+<ul id="menu"><li><a href="index.html#how">How it works</a></li><li><a href="index.html#try">Try it</a></li><li><a href="index.html#plan">Plan mode</a></li><li><a href="iris.html">Iris</a></li><li><a href="index.html#features">Features</a></li><li><a href="index.html#safety">Safety</a></li><li><a href="download.html" class="cur" aria-current="page">Download</a></li><li><a href="index.html#faq">FAQ</a></li></ul>
 <a class="btn btn-primary btn-sm" href="#get">Download</a>
 <button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="menu" type="button">Menu</button></div></header>'''
 def code(t,label="Copy"): return '<div class="code"><pre>'+t+'</pre><button class="copy" type="button" data-copy>'+label+'</button></div>'
@@ -52,7 +52,7 @@ html=f'''<!DOCTYPE html>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='15' fill='%230B1118'/%3E%3Cpath d='M15 29l13 10-13 10' fill='none' stroke='%237DF08A' stroke-width='6' stroke-linecap='round' stroke-linejoin='round'/%3E%3Crect x='33' y='46' width='16' height='5' rx='2.5' fill='%23fff'/%3E%3Ccircle cx='44' cy='24' r='7' fill='%233DF5A7'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..800&family=Geist+Mono:wght@400..600&display=swap" rel="stylesheet">
-<style>{style}{extra}</style></head><body>
+<style>{style}{extra}@media (min-width:861px) and (max-width:1120px){{.nav-in{{gap:12px;padding-left:16px}}.nav ul a{{padding:8px 9px;font-size:.88rem}}}}</style></head><body>
 <svg width="0" height="0" style="position:absolute;overflow:hidden" aria-hidden="true" focusable="false">{defs}<symbol id="nmark" viewBox="0 0 512 512">{body}</symbol></svg>
 <a class="skip" href="#main">Skip to content</a><div id="prog" aria-hidden="true"></div>
 {nav}
@@ -132,7 +132,8 @@ html=f'''<!DOCTYPE html>
   <div class="wrap">
     <div class="sec-head rv"><h2 id="rel-h">Release notes.</h2></div>
     <div class="rel">
-      <div class="rv"><b>{VER}</b><p><strong>Tab works in more places.</strong> Sentences that start with <code>newton</code>, such as <code>newton find big files</code>, now turn into commands with Tab. Newton also recognises many more everyday words, so shorter requests are caught. <kbd>Esc</kbd> then <kbd>N</kbd> forces Newton on any line.</p></div>
+      <div class="rv"><b>{VER}</b><p><strong>Meet Iris.</strong> A new chat app that works on your computer: run <code>newton agent</code> and ask for a task. Iris runs read-only steps on its own, asks before anything that could change something, and keeps everything on your machine. Rename it with <code>newton config agent_name</code>.</p></div>
+      <div class="rv"><b>2.2.1</b><p><strong>Tab works in more places.</strong> Sentences that start with <code>newton</code>, such as <code>newton find big files</code>, now turn into commands with Tab. Newton also recognises many more everyday words, so shorter requests are caught. <kbd>Esc</kbd> then <kbd>N</kbd> forces Newton on any line.</p></div>
       <div class="rv"><b>2.2</b><p><strong>Installer and updates.</strong> One-file install into <code>~/.local/bin</code>, a marked block in your shell config, <code>newton update</code> from a zip, folder or link, <code>newton uninstall</code>, and install checks in <code>newton doctor</code>. Chromebook is supported.</p></div>
       <div class="rv"><b>2.1</b><p><strong>Plan mode, upgraded.</strong> Works better with small local models, preflight check for needed programs, undo, export as a script or Markdown, per-step timing, and a tab title and bell when a plan finishes.</p></div>
       <div class="rv"><b>2.0</b><p><strong>Plan mode, ask, chat, fix and commit.</strong> Checklists you approve one step at a time, questions answered in the terminal, failed commands explained and fixed, and commit messages written from your staged changes.</p></div>
@@ -152,7 +153,7 @@ html=f'''<!DOCTYPE html>
 <footer class="footer"><div class="wrap">
   <div class="foot-grid">
     <div class="foot-brand"><a class="brand" href="index.html" aria-label="Newton home"><svg viewBox="0 0 512 512" aria-hidden="true"><use href="#nmark"/></svg>newton</a><p>Think it. Tab it. Done.</p></div>
-    <div><h3>Product</h3><ul><li><a href="index.html#how">How it works</a></li><li><a href="index.html#try">Try it</a></li><li><a href="index.html#plan">Plan mode</a></li><li><a href="index.html#safety">Safety</a></li><li><a href="download.html">Download</a></li></ul></div>
+    <div><h3>Product</h3><ul><li><a href="index.html#how">How it works</a></li><li><a href="index.html#try">Try it</a></li><li><a href="index.html#plan">Plan mode</a></li><li><a href="iris.html">Iris</a></li><li><a href="index.html#safety">Safety</a></li><li><a href="download.html">Download</a></li></ul></div>
     <div><h3>Company</h3><ul><li><a href="about.html">About</a></li><li><a href="team.html">Team</a></li><li><a href="invest.html">Invest</a></li><li><a href="donate.html">Donate</a></li></ul></div>
     <div><h3>Resources</h3><ul><li><a href="download.html">Download</a></li><li><a href="docs.html">Documentation</a></li><li><a href="index.html#video">Company video</a></li><li><a href="index.html#faq">FAQ</a></li></ul></div>
   </div>

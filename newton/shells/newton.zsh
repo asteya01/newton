@@ -26,7 +26,7 @@ typeset -ga _newton_english=(the a an all every that which from into in on of fo
   bigger larger smaller older newer files folder folders directory directories this these those is are
   using named called containing recursively everything each current last and or how what show list
   to by at it its you please can i want not only any new old big large small biggest largest first top count number size sizes bytes lines line name names extension type modified created today yesterday hours days minutes ago port process processes running listening free space disk memory usage over under between per out up down again then so was be do does display get give print find where who when why inside outside text content contents whose has have had)
-typeset -g _newton_subcmds=" suggest explain setup init doctor history config help plan resume plans status prompt ask chat fix commit update uninstall "
+typeset -g _newton_subcmds=" suggest explain setup init doctor history config help plan resume plans status prompt ask chat fix commit agent update uninstall "
 
 _newton_is_natural() {
   emulate -L zsh

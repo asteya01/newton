@@ -26,6 +26,7 @@ DEFAULTS: Dict[str, Any] = {
     "share_output": True,     # on a failed step, send the last lines of its output to the AI for diagnosis
     "plan_timeout": 90,       # seconds to wait while the AI drafts a plan
     "plan_max_steps": 15,
+    "agent_name": "",         # what the `newton agent` app calls itself (empty = Iris)
 }
 
 

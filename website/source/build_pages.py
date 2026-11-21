@@ -136,8 +136,18 @@ docs_body=f'''
 <li><strong>Undo and export.</strong> <code>newton plans undo</code> reverses steps newest first and asks before each. <code>newton plans export -o setup.sh</code> makes a runnable script; <code>--md</code> gives a checklist.</li></ul>
 <p>Put <code>$(newton prompt)</code> in your prompt to keep the active plan visible.</p></section>
 
+<section id="iris"><h2>Iris, the agent</h2>
+<p>Run <code>newton agent</code> to open <strong>Iris</strong>, a chat app in your browser that can look around your computer and do tasks step by step.</p>
+{code('newton agent                     # open Iris in the current folder\nnewton agent --dir ~/projects     # start in another folder\nnewton agent --ask                # ask before every command\nnewton agent --no-open            # print the link instead of opening a browser')}
+<ul><li><strong>Read-only steps run on their own.</strong> Listing files, reading a git log or checking disk use needs no approval.</li>
+<li><strong>Everything else asks first.</strong> You see the exact command with Allow and Deny. Commands the safety rules flag always ask, with the reason.</li>
+<li><strong>Secrets stay out.</strong> Iris does not read <code>.env</code>, SSH keys or <code>.pem</code> files, and command output is redacted before the AI sees it.</li>
+<li><strong>Local only.</strong> The app listens on <code>127.0.0.1</code> and answers only to a private link. Chats are saved on your computer.</li>
+<li><strong>Rename it.</strong> <code>newton config agent_name Theo</code> changes the name Iris uses.</li></ul>
+<p>Iris works best with a capable model. Small local models can be slower and sometimes need a nudge to follow the step-by-step format. See the <a href="iris.html">Iris page</a> for a demo.</p></section>
+
 <section id="commands"><h2>Commands</h2>
-{tbl([["<code>newton ask &lt;question&gt;</code>","Streams an answer in your terminal. Pipe anything in (<code>make 2&gt;&amp;1 | newton ask why did this fail</code>) or attach files with <code>-f</code>."],["<code>newton chat</code>","A conversation with your shell attached. <code>!cmd</code> runs a command and shows Newton the output, <code>/run</code> executes the last code block."],["<code>newton fix</code>","Looks at your last command, re-runs it to see the real error, explains what went wrong and offers a fix. Destructive commands are never re-run."],["<code>newton commit</code>","Reads your staged diff and writes a clear commit message. You approve it before anything is committed."],["<code>newton explain '…'</code>","A flag-by-flag breakdown of a command."],["<code>newton suggest -c \"…\"</code>","Print a suggestion and copy it to the clipboard. <code>--json</code> gives full JSON."],["<code>newton history</code>","What you've asked recently."],["<code>newton doctor</code>","Checks your key, connection, shell integration, install and PATH."]],["Command","What it does"])}
+{tbl([["<code>newton ask &lt;question&gt;</code>","Streams an answer in your terminal. Pipe anything in (<code>make 2&gt;&amp;1 | newton ask why did this fail</code>) or attach files with <code>-f</code>."],["<code>newton chat</code>","A conversation with your shell attached. <code>!cmd</code> runs a command and shows Newton the output, <code>/run</code> executes the last code block."],["<code>newton fix</code>","Looks at your last command, re-runs it to see the real error, explains what went wrong and offers a fix. Destructive commands are never re-run."],["<code>newton agent</code>","Opens Iris, the chat agent, in your browser. <a href=\"#iris\">Learn more</a>."],["<code>newton commit</code>","Reads your staged diff and writes a clear commit message. You approve it before anything is committed."],["<code>newton explain '…'</code>","A flag-by-flag breakdown of a command."],["<code>newton suggest -c \"…\"</code>","Print a suggestion and copy it to the clipboard. <code>--json</code> gives full JSON."],["<code>newton history</code>","What you've asked recently."],["<code>newton doctor</code>","Checks your key, connection, shell integration, install and PATH."]],["Command","What it does"])}
 <p><code>newton fix</code> needs the shell integration, which records your last command and exit status in a private file. For better plans, use a stronger model for heavy work: <code>newton config smart_model claude-sonnet-5-5</code>.</p></section>
 
 <section id="providers"><h2>Providers</h2>
@@ -172,7 +182,7 @@ docs_body=f'''
 <li><strong>Something else is shadowing Newton.</strong> <code>newton doctor</code> warns when your shell finds a different <code>newton</code> first, such as an old pip install. Remove the other copy.</li>
 <li><strong>Anything else:</strong> run <code>newton doctor</code>.</li></ul></section>
 '''
-toc=[("start","Quick start"),("keys","Keys"),("plan","Plan mode"),("commands","Commands"),("providers","Providers"),("settings","Settings"),("update","Update and uninstall"),("privacy","Privacy"),("help","Troubleshooting")]
+toc=[("start","Quick start"),("keys","Keys"),("plan","Plan mode"),("iris","Iris"),("commands","Commands"),("providers","Providers"),("settings","Settings"),("update","Update and uninstall"),("privacy","Privacy"),("help","Troubleshooting")]
 docs=hero("Documentation","Everything Newton can do.","Install it, learn the keys, and get the most out of plan mode.")
 docs+='<section class="band light"><div class="wrap docs"><nav class="toc" aria-label="On this page">'+''.join(f'<a href="#{i}">{t}</a>' for i,t in toc)+'</nav><div class="doc">'+docs_body+'</div></div></section>'
 page('docs.html','Documentation · Newton','Newton documentation: install, keys, plan mode, commands, providers, settings and privacy.',docs)

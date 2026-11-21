@@ -172,7 +172,7 @@ footer nav{display:flex;gap:22px;flex-wrap:wrap}footer a{color:var(--muted);text
 <aside class="sum" aria-labelledby="s-h">
   <h2 id="s-h">In short</h2>
   <ul>
-    <li><span><strong>You type a sentence, press Tab, and the command appears.</strong> Then you read it and press Enter. Newton never runs anything for you.</span></li>
+    <li><span><strong>You type a sentence, press Tab, and the command appears.</strong> Then you read it and press Enter. Tab never runs anything for you.</span></li>
     <li><span>It works in <strong>zsh, bash and fish</strong>, with Claude, any OpenAI-compatible service, or <strong>Ollama for free and offline</strong>.</span></li>
     <li><span>It is <strong>free, open source and MIT licensed</strong>, with no account and no telemetry.</span></li>
   </ul>
@@ -214,7 +214,7 @@ footer nav{display:flex;gap:22px;flex-wrap:wrap}footer a{color:var(--muted);text
 <h2 id="trust">You stay in control</h2>
 <p>A tool that writes commands is only useful if you can trust it, and trust is mostly about what the tool refuses to do. So Newton is built around a few rules that never bend.</p>
 <ul class="pts">
-<li><strong>It never runs a command for you.</strong> The command sits in your prompt. You press Enter, or you don't.</li>
+<li><strong>Tab never runs a command for you.</strong> The command sits in your prompt. You press Enter, or you don't.</li>
 <li><strong>It warns you about risk.</strong> If a command is destructive, such as deleting recursively, force-pushing, or throwing away uncommitted changes, Newton says so in plain words before you decide.</li>
 <li><strong>It protects your secrets.</strong> Obvious secrets such as keys and tokens are redacted before anything is sent to a model.</li>
 <li><strong>It has no account and no telemetry.</strong> There is nothing to sign up for and nothing phoning home.</li>
@@ -243,13 +243,16 @@ footer nav{display:flex;gap:22px;flex-wrap:wrap}footer a{color:var(--muted);text
 <h3>Commit</h3>
 <p>Stage your changes and run <code>newton commit</code>. It reads the diff and your recent commit history, then writes a message that matches how you already write them.</p>
 
+<h3>Iris, the agent</h3>
+<p>For bigger jobs you'd rather hand off, run <code>newton agent</code>. It opens <strong>Iris</strong>, a chat window in your browser that works on your own computer. Ask it <em>what's using my disk space?</em> and it runs the commands itself, reads the results, and tells you what it found. Looking around, like listing files or reading a git log, runs on its own. Anything that could change or delete something shows you the exact command and waits for your Allow or Deny. It never reads files like <code>.env</code> or SSH keys, and the app only answers to your own computer.</p>
+
 <h2 id="ai">Your AI, your rules</h2>
 <p>Newton doesn't lock you into one model. You bring your own. Use <strong>Claude</strong> with your Anthropic key, any <strong>OpenAI-compatible</strong> service, or <strong>Ollama</strong> to run a model on your own computer.</p>
 
 <p>That last option matters more than it sounds. With Ollama, Newton is completely free and works offline, and the words you type never leave your machine. A local model is slower than a hosted one, so the first answer can take a few seconds while the model loads. For a lot of people, trading a few seconds for total privacy and a zero-dollar bill is an easy choice.</p>
 
 <h2 id="built">Built to be trusted</h2>
-<p>I care a lot about whether a tool is boringly reliable, so Newton has a serious test suite: 117 automated tests. Some of them open real zsh, bash and fish sessions, type a sentence, press Tab, cycle the alternatives, undo, and check that normal completion is untouched. Plan mode has its own end-to-end suite that includes failures, retries, pausing and resuming.</p>
+<p>I care a lot about whether a tool is boringly reliable, so Newton has a serious test suite: 133 automated tests. Some of them open real zsh, bash and fish sessions, type a sentence, press Tab, cycle the alternatives, undo, and check that normal completion is untouched. Plan mode has its own end-to-end suite that includes failures, retries, pausing and resuming.</p>
 
 <p>Installation is a single script that needs only Python 3.9 or newer. It adds Newton to your path and turns on Tab for your shell. If something is off, <code>newton doctor</code> checks your setup and tells you what to fix. Uninstalling is one command, and it removes exactly what the installer added.</p>
 
@@ -259,7 +262,7 @@ footer nav{display:flex;gap:22px;flex-wrap:wrap}footer a{color:var(--muted);text
 <p><strong>If you run servers or build software,</strong> plan mode and <code>newton fix</code> turn long, fiddly tasks into things you can review one step at a time.</p>
 
 <h2 id="honest">What Newton isn't</h2>
-<p>Newton is young, and I'd rather tell you that than pretend otherwise. It writes commands with the help of an AI model, and models make mistakes. That's the reason it never runs anything on its own, and the reason I'd encourage you to read each command before you press Enter. Newton is meant to make you faster and better informed, not to replace your judgment.</p>
+<p>Newton is young, and I'd rather tell you that than pretend otherwise. It writes commands with the help of an AI model, and models make mistakes. That's why Tab never runs anything on its own, why Iris asks before it changes anything, and why I'd encourage you to read each command before you press Enter. Newton is meant to make you faster and better informed, not to replace your judgment.</p>
 <p>It's also a small project. If it gets something wrong, or there's a shell, a platform or a workflow you want it to handle, tell me. That feedback is the most useful thing anyone can give it right now.</p>
 
 <section class="cta" id="try" aria-labelledby="t-h">

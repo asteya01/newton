@@ -139,11 +139,34 @@ Put `$(newton prompt)` in your prompt if you want the active plan always visible
 | `newton ask <question>` | Streams an answer in your terminal. Pipe anything in (`make 2>&1 \| newton ask why did this fail`) or attach files with `-f app.py`. |
 | `newton chat` | A conversation with your shell attached. `!cmd` runs a command and shows Newton the output, `/run` executes the last code block. |
 | `newton fix` | Looks at your **last command**, re-runs it to see the real error, explains what went wrong and offers a fix. Destructive commands are never re-run. |
+| `newton agent` | Opens Iris, the chat agent, in your browser (see below). |
 | `newton commit` | Reads your staged diff and writes a clear commit message. You approve it before anything is committed. |
 
 `newton fix` needs the shell integration, which records your last command and exit status in a private file. Command text is never put in your environment.
 
 For the best plans, use a stronger model for the heavy work: `newton config smart_model claude-sonnet-5-5`. Plain Tab suggestions keep using the fast model.
+
+## Iris: an agent with a real chat window
+
+`newton agent` opens **Iris**, a chat app in your browser that can look around your computer and get things done. Ask it something like "what's using my disk space?" and it runs the commands itself, step by step, reads the results, and tells you what it found.
+
+```sh
+newton agent                      # open Iris in your browser, working in the current folder
+newton agent --dir ~/projects     # start in a different folder
+newton agent --ask                # ask before every command, even harmless ones
+newton agent --no-open            # print the link instead of opening a browser
+```
+
+| | |
+|---|---|
+| **Read-only steps run on their own** | Looking at things (`ls`, `cat`, `git log`, `du`, `grep` and similar) runs without asking, so Iris can investigate. |
+| **Everything else asks first** | Anything that could change or delete something shows an **Allow / Deny** card with the exact command. Commands the safety rules flag as dangerous always ask, with the reason. |
+| **Switch it to ask-always** | The *Ask before every command* switch in the sidebar (or `--ask`) makes Iris wait for you on every command. |
+| **Secrets stay out** | Iris won't read `.env`, SSH keys, `.pem` files or credentials files, and command output is redacted before the AI sees it. |
+| **Local only** | The app listens on `127.0.0.1` with a one-time link and a private cookie. Nothing is exposed to your network, and chats are saved only on your computer. |
+| **Your AI, your rules** | Uses the same provider you set up for Newton: Claude, an OpenAI-compatible service, or Ollama for free. |
+
+Iris works best with a capable model. Small local models can be slower and may sometimes need a nudge to follow the step-by-step format.
 
 ## Keys
 
@@ -252,7 +275,7 @@ newton/
 python3 -W ignore -m unittest discover -s tests -v
 ```
 
-The suite runs against a local mock of the API (no key or network needed) and includes **live end-to-end tests** that open real zsh, bash and fish sessions in a pseudo-terminal. They type a sentence, press Tab, cycle alternatives, undo, and check that normal completion is untouched. A second suite (`tests/test_agent.py`) covers plan mode end to end: single-keypress runs in a real pty, failure → fix → retry, pause and resume, danger gating, and the last-command hooks in all three shells.
+The suite runs against a local mock of the API (no key or network needed) and includes **live end-to-end tests** that open real zsh, bash and fish sessions in a pseudo-terminal. They type a sentence, press Tab, cycle alternatives, undo, and check that normal completion is untouched. A second suite (`tests/test_agent.py`) covers plan mode end to end: single-keypress runs in a real pty, failure → fix → retry, pause and resume, danger gating, and the last-command hooks in all three shells. `tests/test_iris.py` covers the Iris agent: which commands count as read-only, the approval flow, secret-file refusal and redaction, and the local server's token, host and origin checks.
 
 ## Troubleshooting
 
@@ -261,6 +284,9 @@ The suite runs against a local mock of the API (no key or network needed) and in
 - **macOS bash.** The built-in bash 3.2 is too old. `brew install bash`, or use zsh (the macOS default).
 - **`newton: command not found` after installing.** Open a new terminal. If it persists, run `~/.local/bin/newton doctor`; it checks your PATH and tells you what to fix.
 - **Something else is shadowing Newton.** `newton doctor` warns when your shell finds a different `newton` first (for example an old pip install). Remove the other copy.
+- **Rename Iris.** `newton config agent_name Theo` (or any name you like).
+- **Iris says the AI isn't answering.** Run `newton doctor`. With Ollama, make sure it is running and the model is pulled.
+- **The Iris link says it expired or is invalid.** Close the old tab and run `newton agent` again; each run makes a fresh link.
 - **Anything else:** run `newton doctor`.
 
 ## License

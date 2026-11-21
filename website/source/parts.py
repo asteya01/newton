@@ -197,3 +197,6 @@ def pricing_section():
   </div>
 </section>
 '''
+
+import iris_demo as _iris
+CSS += _iris.CSS

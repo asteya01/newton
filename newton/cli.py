@@ -29,7 +29,7 @@ from newton.engine import NewtonError
 
 SHELLS = ("zsh", "bash", "fish")
 SUBCOMMANDS = {"suggest", "explain", "setup", "init", "doctor", "history", "config", "help",
-               "plan", "resume", "plans", "status", "prompt", "ask", "chat", "fix", "commit", "update", "uninstall"}
+               "plan", "resume", "plans", "status", "prompt", "ask", "chat", "fix", "commit", "agent", "update", "uninstall"}
 # Real English words people may start a request with ("update all my brew packages"). They only act as commands
 # when used on their own, with a flag, or with a single path/URL argument.
 AMBIGUOUS = {"update", "uninstall"}
@@ -423,6 +423,16 @@ def cmd_chat(args: argparse.Namespace) -> int:
     return chat.chat(cfgmod.load())
 
 
+def cmd_agent(args: argparse.Namespace) -> int:
+    from newton import agent_server
+    cfg = cfgmod.load()
+    cwd = os.path.abspath(os.path.expanduser(args.dir or os.getcwd()))
+    if not os.path.isdir(cwd):
+        ui.err(f"That folder doesn't exist: {cwd}")
+        return 1
+    return agent_server.serve(cfg, cwd, port=args.port, open_browser=not args.no_open, mode="ask" if args.ask else "smart")
+
+
 def cmd_fix(args: argparse.Namespace) -> int:
     from newton import fixcmd
     return fixcmd.fix(cfgmod.load(), " ".join(args.words).strip() or None)
@@ -514,6 +524,13 @@ def build_parser() -> argparse.ArgumentParser:
     ak.set_defaults(func=cmd_ask)
 
     sub.add_parser("chat", help="a conversation that knows your machine").set_defaults(func=cmd_chat)
+
+    ag = sub.add_parser("agent", help="open the agent app: give it a goal and it works through it, asking before it changes anything")
+    ag.add_argument("--dir", help="folder to work in (default: here)")
+    ag.add_argument("--port", type=int, default=0, help="port to listen on (default: any free port)")
+    ag.add_argument("--no-open", action="store_true", help="print the link but don't open a browser")
+    ag.add_argument("--ask", action="store_true", help="ask before every command, even read-only ones")
+    ag.set_defaults(func=cmd_agent)
 
     fx = sub.add_parser("fix", help="diagnose the command that just failed")
     fx.add_argument("words", nargs="*", help="a command to run and fix (default: your last command)")
