@@ -406,7 +406,7 @@ kbd.hit { background: var(--mint); color: #04140C; border-color: var(--mint); }
   <div class="floor" aria-hidden="true"></div>
   <div class="wrap hero-grid">
     <div class="hero-copy">
-      <span class="kicker"><i></i>Version 2.2 · Plan mode is here</span>
+      <span class="kicker"><i></i>Version 2.3 · Meet Iris, the agent</span>
       <h1 id="h1"><span>Think it.</span><span>Tab it.</span><span>Done.</span></h1>
       <p class="lead">Describe what you want in plain English and press Tab. Newton writes the exact shell command into your prompt. You read it, change it if you like, and press Enter.</p>
       <div class="hero-cta">
@@ -652,6 +652,8 @@ unzip newton.zip
 cd newton
 sh install.sh</pre><button class="copy" type="button" data-copy>Copy</button></div></li>
             <li><h3>Open a new terminal</h3><p>Type a sentence and press Tab. zsh is the macOS default and works best.</p></li>
+                      <li><h3>Optional: open Iris, the agent</h3><p>Run it in a new terminal. Iris opens in your browser and works in the current folder.</p>
+              <div class="code"><pre>newton agent</pre><button class="copy" type="button" data-copy>Copy</button></div></li>
           </ol>
         </div>
         <div class="panel" id="p-linux" role="tabpanel" aria-labelledby="t-linux" hidden>
@@ -663,6 +665,8 @@ unzip newton.zip
 cd newton
 sh install.sh</pre><button class="copy" type="button" data-copy>Copy</button></div></li>
             <li><h3>Open a new terminal</h3><p>zsh, bash 4+ and fish are supported.</p></li>
+                      <li><h3>Optional: open Iris, the agent</h3><p>Run it in a new terminal. Iris opens in your browser. If no browser opens, copy the link it prints.</p>
+              <div class="code"><pre>newton agent</pre><button class="copy" type="button" data-copy>Copy</button></div></li>
           </ol>
         </div>
         <div class="panel" id="p-chromeos" role="tabpanel" aria-labelledby="t-chromeos" hidden>
@@ -675,6 +679,8 @@ cd ~
 unzip newton.zip
 cd newton
 sh install.sh</pre><button class="copy" type="button" data-copy>Copy</button></div></li>
+                      <li><h3>Optional: open Iris, the agent</h3><p>Run it in the Linux terminal. Copy the link it prints into Chrome if it does not open by itself.</p>
+              <div class="code"><pre>newton agent</pre><button class="copy" type="button" data-copy>Copy</button></div></li>
           </ol>
         </div>
         <div class="panel" id="p-wsl" role="tabpanel" aria-labelledby="t-wsl" hidden>
@@ -689,6 +695,8 @@ unzip newton.zip
 cd newton
 sh install.sh</pre><button class="copy" type="button" data-copy>Copy</button></div></li>
             <li><h3>Use it inside WSL</h3><p>Newton runs in the Linux shell, not in PowerShell.</p></li>
+                      <li><h3>Optional: open Iris, the agent</h3><p>Run it inside WSL. Copy the link it prints into your Windows browser if it does not open by itself.</p>
+              <div class="code"><pre>newton agent</pre><button class="copy" type="button" data-copy>Copy</button></div></li>
           </ol>
         </div>
       </div>
@@ -703,6 +711,12 @@ sh install.sh</pre><button class="copy" type="button" data-copy>Copy</button></d
           <div class="code"><pre>ollama pull llama3.1
 newton config provider ollama
 newton config model llama3.1</pre><button class="copy" type="button" data-copy>Copy</button></div>
+        </div>
+        <div class="card-d spot rv" style="--d:.05s">
+          <h3>Meet Iris, the agent</h3>
+          <p class="dim" style="font-size:.95rem">Newton also includes a chat app that works on your computer, step by step. It runs read-only steps on its own and asks before it changes anything.</p>
+          <div class="code"><pre>newton agent</pre><button class="copy" type="button" data-copy>Copy</button></div>
+          <p class="dim" style="font-size:.9rem"><a href="iris.html" style="color:var(--mint)">See how Iris works</a></p>
         </div>
         <div class="card-d spot rv" style="--d:.1s">
           <h3>Update or remove it</h3>
